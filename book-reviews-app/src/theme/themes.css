@@ -1,0 +1,42 @@
+.theme-toggle-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: all 0.3s;
+  }
+  
+  .theme-toggle-button:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+  }
+  
+  /* Style for light mode */
+  .light-mode .theme-toggle-button {
+    color: #ffa41b;
+  }
+  
+  .light-mode .theme-toggle-button:hover {
+    color: #e5732a;
+  }
+  
+  /* Style for dark mode */
+  .dark-mode .theme-toggle-button {
+    color: #faad14;
+  }
+  
+  .dark-mode .theme-toggle-button:hover {
+    color: #ffca3a;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Animation for theme toggle */
+  .theme-toggle-button .anticon {
+    transition: transform 0.3s ease;
+  }
+  
+  .theme-toggle-button:hover .anticon {
+    transform: rotate(30deg);
+  }

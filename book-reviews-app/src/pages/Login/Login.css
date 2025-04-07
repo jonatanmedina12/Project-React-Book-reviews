@@ -1,0 +1,384 @@
+/* Modern Login Styles - Refined version */
+
+/* Main container with gradient background */
+.modern-login-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #121212;
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+  }
+  
+  /* Background decorative blobs */
+  .modern-login-container::before {
+    content: "";
+    position: absolute;
+    width: 40vw;
+    height: 40vw;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #ffa41b, #ff5722);
+    top: -15vw;
+    left: -15vw;
+    z-index: 0;
+    filter: blur(30px);
+    opacity: 0.7;
+  }
+  
+  .modern-login-container::after {
+    content: "";
+    position: absolute;
+    width: 50vw;
+    height: 50vw;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #7c4dff, #b388ff);
+    bottom: -15vw;
+    right: -15vw;
+    z-index: 0;
+    filter: blur(30px);
+    opacity: 0.7;
+  }
+  
+  /* Content layout */
+  .modern-login-content {
+    display: flex;
+    width: 100%;
+    max-width: 1100px;
+    height: auto;
+    min-height: 600px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  /* Form container - white panel */
+  .modern-login-form-container {
+    background: white;
+    width: 50%;
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  
+  /* Info container - dark panel with company info */
+  .modern-login-info {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Add moving gradient to info panel */
+  .modern-login-info::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+      rgba(124, 77, 255, 0.2) 0%, 
+      rgba(0, 0, 0, 0) 50%, 
+      rgba(255, 64, 129, 0.2) 100%);
+    z-index: 0;
+  }
+  
+  .modern-login-info-content {
+    position: relative;
+    z-index: 1;
+    max-width: 400px;
+  }
+  
+  /* Logo styling */
+  .modern-login-logo {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 56px;
+    height: 56px;
+    font-size: 28px;
+    color: white;
+    background: #ff4d4f;
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+  
+  /* Headings */
+  .modern-login-title {
+    font-weight: 600;
+    font-size: 28px;
+    margin-bottom: 10px !important;
+    color: #333;
+  }
+  
+  .modern-login-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 32px;
+    display: block;
+  }
+  
+  .modern-info-title {
+    font-size: 38px;
+    font-weight: 700;
+    margin-bottom: 16px !important;
+    background: linear-gradient(90deg, #fff, #e0e0e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .modern-info-subtitle {
+    font-size: 24px;
+    font-weight: 400;
+    margin-bottom: 40px !important;
+    opacity: 0.8;
+    color:white !important;
+  }
+  
+  /* Form elements */
+  .modern-login-form {
+    margin-bottom: 24px;
+  }
+  
+  .modern-input {
+    height: 50px;
+    border-radius: 8px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    transition: all 0.3s;
+  }
+  
+  .modern-input:hover {
+    border-color: #40a9ff;
+  }
+  
+  .modern-input:focus {
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    border-color: #40a9ff;
+  }
+  
+  /* Primary button */
+  .modern-primary-button {
+    height: 50px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 16px;
+    background: #1890ff;
+    border: none;
+    margin-top: 8px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(24, 144, 255, 0.25);
+  }
+  
+  .modern-primary-button:hover {
+    background: #40a9ff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(24, 144, 255, 0.3);
+  }
+  
+  .modern-primary-button:active {
+    transform: translateY(0);
+  }
+  
+  /* Divider styling */
+  .modern-divider {
+    margin: 24px 0;
+    position: relative;
+  }
+  
+  .modern-divider .ant-divider {
+    color: #888;
+    font-size: 14px;
+  }
+  
+  /* Social login buttons */
+  .modern-github-button, 
+  .modern-google-button {
+    height: 50px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+  }
+  
+  .modern-github-button {
+    background: #24292e;
+    color: white;
+    border: none;
+  }
+  
+  .modern-github-button:hover {
+    background: #3a3f46;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modern-google-button {
+    background: white;
+    color: #666;
+    border: 1px solid #ddd;
+  }
+  
+  .modern-google-button:hover {
+    background: #f8f8f8;
+    color: #333;
+    border-color: #ccc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Footer text */
+  .modern-login-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 13px;
+    color: #888;
+  }
+  
+  .modern-login-footer a {
+    color: #1890ff;
+    transition: color 0.3s;
+  }
+  
+  .modern-login-footer a:hover {
+    color: #40a9ff;
+    text-decoration: underline;
+  }
+  
+  /* Company logos section */
+  .company-logos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 40px;
+  }
+  
+  .logo-item {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    transition: all 0.3s;
+  }
+  
+  .logo-item:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+  }
+  
+  /* Form animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .modern-login-form .ant-form-item {
+    animation: fadeInUp 0.5s ease-out backwards;
+  }
+  
+  .modern-login-form .ant-form-item:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  
+  .modern-login-form .ant-form-item:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .modern-login-form .ant-form-item:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  
+  .modern-github-button {
+    animation: fadeInUp 0.5s ease-out 0.4s backwards;
+  }
+  
+  .modern-google-button {
+    animation: fadeInUp 0.5s ease-out 0.5s backwards;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .modern-login-content {
+      flex-direction: column;
+      max-width: 500px;
+    }
+    
+    .modern-login-form-container {
+      width: 100%;
+      padding: 40px 30px;
+    }
+    
+    .modern-login-info {
+      padding: 40px 30px;
+      min-height: 300px;
+    }
+    
+    .modern-info-title {
+      font-size: 32px;
+    }
+    
+    .modern-info-subtitle {
+      font-size: 20px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .modern-login-container {
+      padding: 0;
+    }
+    
+    .modern-login-content {
+      min-height: 100vh;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    
+    .modern-login-form-container {
+      padding: 30px 20px;
+    }
+    
+    .modern-login-info {
+      padding: 30px 20px;
+      min-height: 250px;
+    }
+    
+    .modern-info-title {
+      font-size: 28px;
+    }
+    
+    .modern-info-subtitle {
+      font-size: 18px;
+      margin-bottom: 20px !important;
+    }
+    
+    .company-logos {
+      gap: 12px;
+    }
+    
+    .logo-item {
+      width: 50px;
+      height: 50px;
+    }
+  }

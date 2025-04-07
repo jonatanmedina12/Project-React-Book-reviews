@@ -86,22 +86,4 @@ const mockLogin = (email: string, password: string): Promise<LoginResponse> => {
   });
 };
 
-/**
- * Mock register function for development without backend
- * 
- * @param username - Desired username
- * @param email - User email
- * @param password - User password
- * @returns Mock registration response
- */
-const mockRegister = (username: string, email: string, password: string): Promise<any> => {
-  return new Promise((resolve) => {
-    // Simulate API delay
-    setTimeout(() => {
-      resolve({
-        success: true,
-        message: 'User registered successfully',
-      });
-    }, 800);
-  });
-};
+

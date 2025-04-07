@@ -1,0 +1,349 @@
+/* BookDetails.css - Modern styles for book details page */
+
+.book-details-container {
+    position: relative;
+  }
+  
+  /* Loading state */
+  .book-details-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+  }
+  
+  .loading-text {
+    margin-top: 16px;
+    color: var(--text-color-secondary, rgba(0, 0, 0, 0.45));
+  }
+  
+  /* Header and navigation */
+  .book-details-header {
+    margin-bottom: 24px;
+  }
+  
+  .back-button {
+    transition: all 0.3s;
+  }
+  
+  .back-button:hover {
+    transform: translateX(-3px);
+  }
+  
+  /* Content layout */
+  .book-details-content {
+    margin-bottom: 40px;
+  }
+  
+  /* Book image */
+  .book-image-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .book-cover-image {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s;
+  }
+  
+  .book-cover-image:hover {
+    transform: scale(1.02);
+  }
+  
+  .book-image-preview-mask {
+    border-radius: 12px;
+  }
+  
+  /* Book actions card */
+  .book-actions-card {
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.3s;
+  }
+  
+  .book-actions-card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  }
+  
+  .book-rating-container {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  
+  .book-rating {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  
+  .book-rating-text {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  
+  .book-reviews-count {
+    display: block;
+    color: var(--text-color-secondary, rgba(0, 0, 0, 0.45));
+    font-size: 14px;
+  }
+  
+  .book-actions-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  
+  .action-button {
+    height: 40px;
+    border-radius: 6px;
+    transition: all 0.3s;
+  }
+  
+  .favorite-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(24, 144, 255, 0.2);
+  }
+  
+  .share-button:hover {
+    transform: translateY(-2px);
+  }
+  
+  .book-category-container {
+    text-align: center;
+    margin-top: 16px;
+  }
+  
+  .book-category-tag {
+    font-size: 14px;
+    padding: 4px 12px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .book-category-tag:hover {
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+  
+  /* Book details header */
+  .book-details-header-content {
+    margin-bottom: 24px;
+  }
+  
+  .book-title {
+    margin-bottom: 8px !important;
+    font-weight: 600;
+  }
+  
+  .book-author {
+    margin-top: 0 !important;
+    font-weight: 400;
+  }
+  
+  /* Tabs */
+  .book-details-tabs .ant-tabs-nav {
+    margin-bottom: 24px;
+  }
+  
+  .book-details-tabs .ant-tabs-tab {
+    padding: 12px 16px;
+    transition: all 0.3s;
+  }
+  
+  .book-details-tabs .ant-tabs-tab-active {
+    font-weight: 500;
+  }
+  
+  /* Book summary */
+  .book-summary-container {
+    margin-bottom: 32px;
+  }
+  
+  .section-title {
+    margin-bottom: 16px !important;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 8px;
+  }
+  
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background-color: var(--primary-color, #1890ff);
+    border-radius: 3px;
+  }
+  
+  .book-summary {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  /* Book metadata */
+  .book-metadata-container {
+    margin-bottom: 32px;
+  }
+  
+  .book-metadata-grid {
+    margin-top: 16px;
+  }
+  
+  .metadata-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .metadata-icon {
+    margin-right: 8px;
+    color: var(--primary-color, #1890ff);
+  }
+  
+  .metadata-item .ant-typography {
+    margin-right: 8px;
+  }
+  
+  /* Reviews section */
+  .reviews-section-card {
+    margin-bottom: 24px;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  
+  .reviews-section-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .your-review-card {
+    background-color: rgba(24, 144, 255, 0.03);
+    border: 1px solid rgba(24, 144, 255, 0.1);
+  }
+  
+  .reviews-divider {
+    margin: 32px 0;
+  }
+  
+  .reviews-loading-spinner {
+    margin-left: 12px;
+  }
+  
+  .login-alert {
+    margin-bottom: 24px;
+  }
+  
+  .all-reviews-container {
+    position: relative;
+  }
+  
+  .no-reviews-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background-color: var(--bg-component, #fff);
+    border-radius: 8px;
+    border: 1px dashed var(--border-color, #d9d9d9);
+  }
+  
+  .no-reviews-icon {
+    font-size: 32px;
+    margin-bottom: 16px;
+    color: var(--text-color-secondary, rgba(0, 0, 0, 0.45));
+  }
+  
+  .no-reviews-text {
+    font-size: 16px;
+    color: var(--text-color-secondary, rgba(0, 0, 0, 0.45));
+  }
+  
+  /* Affix container for responsive design */
+  .book-actions-affix-container {
+    display: none;
+  }
+  
+  /* Responsive styles */
+  @media (min-width: 768px) {
+    .book-actions-affix-container {
+      display: block;
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .book-details-container {
+      padding-bottom: 60px;
+    }
+    
+    .book-cover-image {
+      max-width: 230px;
+    }
+    
+    .book-actions-card {
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    
+    .book-actions-buttons {
+      flex-direction: row;
+    }
+    
+    .action-button {
+      flex: 1;
+    }
+    
+    .book-summary {
+      font-size: 15px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .book-cover-image {
+      max-width: 200px;
+    }
+    
+    .book-title {
+      font-size: 24px !important;
+    }
+    
+    .book-author {
+      font-size: 16px !important;
+    }
+    
+    .section-title {
+      font-size: 18px !important;
+    }
+    
+    .book-summary {
+      font-size: 14px;
+    }
+  }
+  
+  /* Dark mode specific adjustments */
+  .dark-mode .book-cover-image {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .dark-mode .book-actions-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dark-mode .your-review-card {
+    background-color: rgba(24, 144, 255, 0.06);
+    border: 1px solid rgba(24, 144, 255, 0.15);
+  }
+  
+  .dark-mode .no-reviews-container {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
