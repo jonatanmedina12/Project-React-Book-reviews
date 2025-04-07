@@ -1,12 +1,21 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+// Create root element
+const rootElement = document.getElementById('root');
+
+// Check if root element exists
+if (!rootElement) {
+  throw new Error('Failed to find the root element');
+}
+
+// Create React root
+const root = createRoot(rootElement);
+
+// Render the application
 root.render(
   <React.StrictMode>
     <App />

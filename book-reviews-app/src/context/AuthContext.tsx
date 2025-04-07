@@ -1,6 +1,6 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 import { message } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, NavigateFunction } from 'react-router-dom';
 import { login as loginService, register as registerService } from '../services/authService';
 
 // Definición de tipos
@@ -25,20 +25,28 @@ interface AuthProviderProps {
 }
 
 // Creación del contexto
-export const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
-  loading: true,
-  login: async () => {},
-  register: async () => {},
-  logout: () => {},
-});
+const AuthContext = createContext<AuthContextType | null>(null);
 
-// Proveedor de autenticación
+/**
+ * Custom hook to handle navigation when not inside the Router context
+ * This prevents the "Invalid hook call" error
+ */
+const useCustomNavigate = (): NavigateFunction => {
+  const navigate = useNavigate();
+  return navigate;
+};
+
+/**
+ * Authentication Provider Component
+ * 
+ * Manages authentication state and provides authentication methods
+ * to the entire application.
+ */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const navigate = useNavigate();
+  const navigate = useCustomNavigate();
+  const location = useLocation();
 
   // Verificar si hay un token almacenado al iniciar
   useEffect(() => {
@@ -60,6 +68,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           
           setUser(userInfo);
         } catch (error) {
+          console.error('Error validando token:', error);
           localStorage.removeItem('token');
           setUser(null);
         }
@@ -70,6 +79,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     checkAuthentication();
   }, []);
+
+  // Redireccionar a login si no está autenticado en rutas protegidas
+  useEffect(() => {
+    const publicPaths = ['/login', '/register'];
+    const isPublicPath = publicPaths.includes(location.pathname);
+    
+    if (!loading && !user && !isPublicPath) {
+      navigate('/login');
+    }
+  }, [loading, user, location.pathname, navigate]);
 
   // Función de inicio de sesión
   const login = async (email: string, password: string) => {
@@ -86,6 +105,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       message.success('¡Inicio de sesión exitoso!');
       navigate('/');
     } catch (error) {
+      console.error('Error en login:', error);
       message.error('Error al iniciar sesión. Verifica tus credenciales.');
       throw error;
     } finally {
@@ -102,6 +122,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       message.success('¡Registro exitoso! Ahora puedes iniciar sesión.');
       navigate('/login');
     } catch (error) {
+      console.error('Error en registro:', error);
       message.error('Error al registrarse. Inténtalo de nuevo.');
       throw error;
     } finally {
@@ -117,26 +138,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     navigate('/login');
   };
 
+  const value = {
+    user,
+    isAuthenticated: !!user,
+    loading,
+    login,
+    register,
+    logout,
+  };
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        loading,
-        login,
-        register,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Hook personalizado para usar el contexto de autenticación
+/**
+ * Custom hook to use the authentication context
+ * 
+ * @throws Error if used outside of AuthProvider
+ * @returns Authentication context
+ */
 export const useAuth = () => {
-  const context = React.useContext(AuthContext);
-  if (context === undefined) {
+  const context = useContext(AuthContext);
+  if (context === null) {
     throw new Error('useAuth debe ser utilizado dentro de un AuthProvider');
   }
   return context;
