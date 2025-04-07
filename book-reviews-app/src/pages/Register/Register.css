@@ -1,0 +1,98 @@
+/* Register page specific styles - extends Login.css */
+
+/* Benefits list styling */
+.register-benefits {
+    margin-top: 30px;
+  }
+  
+  .benefit-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    animation: fadeInRight 0.5s ease-out backwards;
+  }
+  
+  .benefit-item:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  
+  .benefit-item:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .benefit-item:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  
+  .benefit-item:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  
+  .benefit-icon {
+    width: 24px;
+    height: 24px;
+    background-color: rgba(124, 77, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    color: #b388ff;
+    font-weight: bold;
+  }
+  
+  .benefit-text {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 16px;
+  }
+  
+  /* Animation for benefits */
+  @keyframes fadeInRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  /* Adjust the form container for more fields */
+  .modern-login-form-container .modern-login-form {
+    margin-bottom: 16px;
+  }
+  
+  /* More compact spacing for register form with more fields */
+  .modern-login-container .ant-form-item {
+    margin-bottom: 16px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .benefit-item {
+      margin-bottom: 12px;
+    }
+    
+    .benefit-text {
+      font-size: 15px;
+    }
+    
+    .register-benefits {
+      margin-top: 20px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .benefit-item {
+      margin-bottom: 10px;
+    }
+    
+    .benefit-text {
+      font-size: 14px;
+    }
+    
+    .register-benefits {
+      margin-top: 16px;
+    }
+  }
