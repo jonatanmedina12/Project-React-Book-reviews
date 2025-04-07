@@ -5,7 +5,6 @@ import { Layout, Menu, Input, Button, Dropdown, Avatar, Space, Drawer } from 'an
 import {
   BookOutlined,
   UserOutlined,
-  SearchOutlined,
   MenuOutlined,
   LogoutOutlined,
   LoginOutlined,
@@ -19,8 +18,8 @@ const { Search } = Input;
 const MainLayout: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
+  const [, setSearchQuery] = useState('');
+    const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
