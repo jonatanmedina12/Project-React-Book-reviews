@@ -2,17 +2,24 @@ import React from 'react';
 import { Card, Rate, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { Book } from '../../types/Book';
+import './BooksComponents.css';
 
-const { Meta } = Card;
 const { Text } = Typography;
 
 interface BookCardProps {
   book: Book;
 }
 
+/**
+ * Componente para mostrar la tarjeta de un libro
+ * Implementa el estilo moderno que coincide con el diseño del login
+ */
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
   const navigate = useNavigate();
 
+  /**
+   * Navega al detalle del libro cuando se hace clic en la tarjeta
+   */
   const handleClick = () => {
     navigate(`/books/${book.id}`);
   };
@@ -23,33 +30,35 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
   return (
     <Card
       hoverable
-      style={{ width: '100%', marginBottom: 16 }}
+      className="modern-book-card"
+      bodyStyle={{ padding: 0 }}
+      onClick={handleClick}
       cover={
-        <div style={{ overflow: 'hidden', height: 300 }}>
+        <div className="modern-book-cover-wrapper">
           <img
             alt={book.title}
             src={coverImage}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            className="modern-book-cover"
           />
         </div>
       }
-      onClick={handleClick}
     >
-      <Meta
-        title={book.title}
-        description={
-          <>
-            <Text style={{ display: 'block' }}>{book.author}</Text>
-            <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
-              {book.category}
-            </Text>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Rate disabled defaultValue={book.averageRating} allowHalf style={{ fontSize: 14 }} />
-              <Text type="secondary">({book.reviewCount})</Text>
-            </div>
-          </>
-        }
-      />
+      <div className="modern-book-info">
+        <Text className="modern-book-title" title={book.title}>
+          {book.title}
+        </Text>
+        <Text className="modern-book-author">{book.author}</Text>
+        <Text className="modern-book-category">{book.category}</Text>
+        <div className="modern-book-rating">
+          <Rate 
+            disabled 
+            defaultValue={book.averageRating} 
+            allowHalf 
+            style={{ fontSize: 14 }} 
+          />
+          <Text className="modern-book-reviews">({book.reviewCount})</Text>
+        </div>
+      </div>
     </Card>
   );
 };

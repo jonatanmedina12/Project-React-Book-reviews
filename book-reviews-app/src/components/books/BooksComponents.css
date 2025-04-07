@@ -1,0 +1,241 @@
+/* Modern Books Components Styles - adaptado al estilo del login existente */
+
+/* ===== Book Card Styling ===== */
+.modern-book-card {
+    width: 100%;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    border: none;
+  }
+  
+  .modern-book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+  }
+  
+  .modern-book-cover-wrapper {
+    overflow: hidden;
+    height: 300px;
+    position: relative;
+  }
+  
+  .modern-book-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .modern-book-card:hover .modern-book-cover {
+    transform: scale(1.05);
+  }
+  
+  .modern-book-info {
+    padding: 16px;
+  }
+  
+  .modern-book-title {
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 4px !important;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .modern-book-author {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 4px;
+    display: block;
+  }
+  
+  .modern-book-category {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  .modern-book-rating {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .modern-book-rating .ant-rate {
+    font-size: 14px;
+  }
+  
+  .modern-book-rating .ant-rate-star:not(:last-child) {
+    margin-right: 4px;
+  }
+  
+  .modern-book-reviews {
+    font-size: 12px;
+    color: #aaa;
+  }
+  
+  /* ===== Book Filters Styling ===== */
+  .modern-filters-container {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  }
+  
+  .modern-filters-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #333;
+  }
+  
+  .modern-filters-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  
+  .modern-input-search {
+    height: 45px;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s;
+    border: 1px solid #ddd;
+  }
+  
+  .modern-input-search:hover {
+    border-color: #40a9ff;
+  }
+  
+  .modern-input-search:focus {
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    border-color: #40a9ff;
+  }
+  
+  .modern-select .ant-select-selector {
+    height: 45px !important;
+    border-radius: 8px !important;
+    padding: 0 11px !important;
+    border: 1px solid #ddd !important;
+    transition: all 0.3s !important;
+  }
+  
+  .modern-select .ant-select-selection-search {
+    height: 45px !important;
+  }
+  
+  .modern-select .ant-select-selection-item {
+    line-height: 45px !important;
+  }
+  
+  .modern-select .ant-select-selection-placeholder {
+    line-height: 45px !important;
+  }
+  
+  .modern-select:hover .ant-select-selector {
+    border-color: #40a9ff !important;
+  }
+  
+  .modern-select .ant-select-focused .ant-select-selector {
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+    border-color: #40a9ff !important;
+  }
+  
+  .modern-filter-button {
+    height: 45px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 15px;
+    background: #1890ff;
+    border: none;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(24, 144, 255, 0.25);
+  }
+  
+  .modern-filter-button:hover {
+    background: #40a9ff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(24, 144, 255, 0.3);
+  }
+  
+  .modern-reset-button {
+    height: 45px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 15px;
+    border: 1px solid #d9d9d9;
+    transition: all 0.3s;
+  }
+  
+  .modern-reset-button:hover {
+    border-color: #40a9ff;
+    color: #40a9ff;
+  }
+  
+  /* ===== Book List Styling ===== */
+  .modern-books-list-container {
+    padding: 16px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  }
+  
+  .modern-pagination {
+    margin-top: 24px;
+    text-align: center;
+  }
+  
+  .modern-pagination .ant-pagination-item {
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  
+  .modern-pagination .ant-pagination-item:hover {
+    transform: scale(1.05);
+  }
+  
+  .modern-pagination .ant-pagination-item-active {
+    background: #1890ff;
+    border-color: #1890ff;
+  }
+  
+  .modern-pagination .ant-pagination-item-active a {
+    color: white;
+  }
+  
+  .modern-empty {
+    padding: 40px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.9);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 992px) {
+    .modern-filters-form-item {
+      flex: 1 1 calc(50% - 8px);
+      min-width: 200px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .modern-filters-form-item {
+      flex: 1 1 100%;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .modern-book-cover-wrapper {
+      height: 240px;
+    }
+    
+    .modern-filters-container {
+      padding: 16px;
+    }
+  }
