@@ -35,6 +35,16 @@ const MainLayout: React.FC = () => {
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
   const [searchVisible, setSearchVisible] = useState(false);
 
+  // Función manejadora para cerrar sesión
+  const handleLogout = () => {
+    logout();
+  };
+
+  // Función manejadora para cerrar sesión con opción para olvidar credenciales
+  const handleLogoutWithForget = () => {
+    logout(true); // Olvidar credenciales guardadas
+  };
+
   const handleSearch = (value: string) => {
     setSearchQuery(value);
     navigate(`/?search=${encodeURIComponent(value)}`);
@@ -65,7 +75,14 @@ const MainLayout: React.FC = () => {
       label: 'Cerrar Sesión',
       icon: <LogoutOutlined />,
       danger: true,
-      onClick: logout,
+      onClick: handleLogout, // Usar la función manejadora
+    },
+    {
+      key: 'logout-forget',
+      label: 'Cerrar Sesión y Olvidar Credenciales',
+      icon: <LogoutOutlined />,
+      danger: true,
+      onClick: handleLogoutWithForget, // Usar la función manejadora que olvida credenciales
     },
   ];
 
@@ -87,7 +104,7 @@ const MainLayout: React.FC = () => {
     {
       key: '/books',
       icon: <ReadOutlined />,
-      label: <Link to="/books">Libros</Link>,
+      label: <Link to="/books/manage">Libros</Link>,
     },
     {
       key: '/categories',
@@ -167,7 +184,17 @@ const MainLayout: React.FC = () => {
       label: 'Cerrar Sesión',
       danger: true,
       onClick: () => {
-        logout();
+        handleLogout(); // Usar la función manejadora
+        toggleMobileMenu();
+      }
+    },
+    {
+      key: 'logout-forget',
+      icon: <LogoutOutlined />,
+      label: 'Cerrar Sesión y Olvidar',
+      danger: true,
+      onClick: () => {
+        handleLogoutWithForget(); // Usar la función manejadora que olvida credenciales
         toggleMobileMenu();
       }
     },
@@ -246,14 +273,14 @@ const MainLayout: React.FC = () => {
             {/* User section */}
             {isAuthenticated ? (
               <div className="user-section">
-                <Badge count={3} dot className="desktop-only">
-                  <Button
-                    type="text"
-                    className="notification-button desktop-only"
-                    icon={<BellOutlined />}
-                    onClick={() => navigate('/notifications')}
-                  />
-                </Badge>
+              <Badge count={3} dot className="desktop-only">
+                <Button
+                  type="text"
+                  className="notification-button desktop-only"
+                  icon={<BellOutlined />}
+                  onClick={() => navigate('/notifications')}
+                />
+              </Badge>
                 
                 <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={['click']}>
                   <div className="user-avatar-wrapper">
@@ -269,30 +296,30 @@ const MainLayout: React.FC = () => {
               </div>
             ) : (
               <div className="auth-buttons">
-                <Link to="/login" className="desktop-only">
-                  <Button type="link">Iniciar Sesión</Button>
-                </Link>
-                <Link to="/register">
-                  <Button type="primary">Registro</Button>
-                </Link>
-              </div>
+              <Link to="/login" className="desktop-only">
+                <Button type="link">Iniciar Sesión</Button>
+              </Link>
+              <Link to="/register">
+                <Button type="primary">Registro</Button>
+              </Link>
+            </div>
             )}
           </div>
         </div>
         
         {/* Mobile search container */}
         {searchVisible && (
-          <div className="mobile-search-container">
-            <Search
-              placeholder="Buscar libros..."
-              allowClear
-              onSearch={handleSearch}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="mobile-search"
-              autoFocus
-            />
-          </div>
+         <div className="mobile-search-container">
+         <Search
+           placeholder="Buscar libros..."
+           allowClear
+           onSearch={handleSearch}
+           value={searchQuery}
+           onChange={(e) => setSearchQuery(e.target.value)}
+           className="mobile-search"
+           autoFocus
+         />
+       </div>
         )}
       </Header>
       
@@ -340,10 +367,10 @@ const MainLayout: React.FC = () => {
       
       {/* Main content */}
       <Content className="modern-content">
-        <div className="content-container">
-          <Outlet />
-        </div>
-      </Content>
+  <div className="content-container">
+    <Outlet />
+  </div>
+</Content>
       
       {/* Footer */}
       <Footer className="modern-footer">

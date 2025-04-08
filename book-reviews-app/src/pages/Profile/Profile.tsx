@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getUserReviews, deleteReview, updateReview } from '../../services/reviewService';
 import { Review } from '../../types/Review';
 import ReviewList from '../../components/reviews/ReviewList';
-import type {  UploadProps } from 'antd/es/upload';
+import type { UploadProps } from 'antd/es/upload';
 import type { UploadFile } from 'antd/es/upload/interface';
 
 const { Title, Text } = Typography;
@@ -49,13 +49,14 @@ const Profile: React.FC = () => {
       const updatedReview = await updateReview(reviewId, { rating, comment });
       message.success('Reseña actualizada correctamente');
       
-      // Actualizar las reseñas
+      // Actualizar las reseñas - Convertir reviewId a número para comparación
       setUserReviews(prevReviews => 
         prevReviews.map(review => 
-          review.id === reviewId ? updatedReview : review
+          review.id === parseInt(reviewId) ? updatedReview : review
         )
       );
     } catch (error) {
+      console.error('Error al actualizar la reseña:', error);
       message.error('Error al actualizar la reseña');
     }
   };
@@ -65,11 +66,12 @@ const Profile: React.FC = () => {
       await deleteReview(reviewId);
       message.success('Reseña eliminada correctamente');
       
-      // Actualizar las reseñas
+      // Actualizar las reseñas - Convertir reviewId a número para comparación
       setUserReviews(prevReviews => 
-        prevReviews.filter(review => review.id !== reviewId)
+        prevReviews.filter(review => review.id !== parseInt(reviewId))
       );
     } catch (error) {
+      console.error('Error al eliminar la reseña:', error);
       message.error('Error al eliminar la reseña');
     }
   };

@@ -1,0 +1,169 @@
+/* BookImageUpload.css - Estilos para el componente de carga de imágenes de libros */
+
+.book-image-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .book-image-upload .ant-upload-select {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    aspect-ratio: 3/4;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+    border: 1px dashed var(--border-color, #d9d9d9);
+    border-radius: 8px;
+    background-color: var(--upload-bg-color, #fafafa);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .book-image-upload .ant-upload-select:hover {
+    border-color: var(--primary-color, #1890ff);
+  }
+  
+  .book-image-upload .ant-upload-list-picture-card-container {
+    width: 100% !important;
+    max-width: 200px;
+    height: auto !important;
+    aspect-ratio: 3/4;
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
+  
+  .book-image-upload .ant-upload-list-picture-card .ant-upload-list-item {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-color, #d9d9d9);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+  }
+  
+  .book-image-upload .ant-upload-list-picture-card .ant-upload-list-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+  
+  .book-image-upload .ant-upload-list-picture-card .ant-upload-list-item-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .book-image-upload .ant-upload-list-picture-card .ant-upload-list-item-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .book-image-upload .upload-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--text-color-secondary, rgba(0, 0, 0, 0.45));
+  }
+  
+  .book-image-upload .upload-button .anticon {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: var(--text-color-secondary, rgba(0, 0, 0, 0.45));
+  }
+  
+  .book-image-upload .upload-text {
+    margin-top: 8px;
+    color: var(--text-color-secondary, rgba(0, 0, 0, 0.45));
+    font-size: 14px;
+  }
+  
+  .book-image-upload .delete-button {
+    margin-top: 8px;
+    width: 100%;
+    max-width: 200px;
+    transition: all 0.3s ease;
+  }
+  
+  /* Estilos para el modal de previsualización */
+  .image-preview-modal .ant-modal-content {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .image-preview-modal .ant-modal-header {
+    background-color: var(--bg-component, #fff);
+    border-bottom: 1px solid var(--border-color, #f0f0f0);
+    padding: 16px 24px;
+  }
+  
+  .image-preview-modal .ant-modal-body {
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+    background-color: var(--bg-component, #fff);
+  }
+  
+  .image-preview-modal img {
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+  
+  /* Estilos durante la carga */
+  .book-image-upload .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+  
+  .book-image-upload .ant-spin {
+    margin-bottom: 8px;
+  }
+  
+  /* Ajustes responsivos */
+  @media (max-width: 576px) {
+    .book-image-upload .ant-upload-select,
+    .book-image-upload .ant-upload-list-picture-card-container {
+      max-width: 150px;
+    }
+  }
+  
+  /* Ajustes para modo oscuro */
+  .dark-mode .book-image-upload .ant-upload-select {
+    background-color: var(--upload-bg-color, #1f2937);
+    border-color: var(--border-color, #424242);
+  }
+  
+  .dark-mode .book-image-upload .ant-upload-list-picture-card .ant-upload-list-item {
+    border-color: var(--border-color, #424242);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dark-mode .book-image-upload .ant-upload-list-picture-card .ant-upload-list-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .dark-mode .image-preview-modal .ant-modal-header {
+    background-color: var(--bg-component, #1f2937);
+    border-bottom: 1px solid var(--border-color, #303030);
+  }
+  
+  .dark-mode .image-preview-modal .ant-modal-body {
+    background-color: var(--bg-component, #1f2937);
+  }
+  
+  .dark-mode .book-image-upload .upload-button .anticon,
+  .dark-mode .book-image-upload .upload-text {
+    color: var(--text-color-secondary, rgba(255, 255, 255, 0.45));
+  }

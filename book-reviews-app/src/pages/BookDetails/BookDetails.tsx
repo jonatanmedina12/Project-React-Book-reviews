@@ -1,10 +1,22 @@
+/**
+ * @file BookDetails.tsx
+ * @description Componente para mostrar los detalles de un libro junto con sus reseñas
+ * @swagger
+ *  components:
+ *    schemas:
+ *      BookDetails:
+ *        type: object
+ *        properties:
+ *          id:
+ *            type: string
+ *            description: ID del libro
+ */
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Typography,
   Row,
   Col,
-  Image,
   Descriptions,
   Rate,
   Divider,
@@ -21,11 +33,17 @@ import { BookDetails as BookDetailsType } from '../../types/Book';
 import { Review } from '../../types/Review';
 import ReviewList from '../../components/reviews/ReviewList';
 import ReviewForm from '../../components/reviews/ReviewForm';
+import BookImage from '../../components/common/BookImage';
 import { useAuth } from '../../context/AuthContext';
+import './css/BookDetails.css';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 
+/**
+ * Componente principal para mostrar los detalles de un libro
+ * Sigue el principio de responsabilidad única (SRP) para la visualización de detalles de libro
+ */
 const BookDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -36,19 +54,25 @@ const BookDetails: React.FC = () => {
   const [reviewsLoading, setReviewsLoading] = useState<boolean>(true);
   const [userReview, setUserReview] = useState<Review | null>(null);
 
+  // Efecto para cargar los detalles del libro y sus reseñas
   useEffect(() => {
     if (id) {
       fetchBookDetails(id);
       fetchBookReviews(id);
     }
-  }, );
+  }, [id]);
 
+  /**
+   * Obtiene los detalles del libro desde el servicio
+   * @param bookId ID del libro a consultar
+   */
   const fetchBookDetails = async (bookId: string) => {
     try {
       setLoading(true);
       const data = await getBookById(bookId);
       setBook(data);
     } catch (error) {
+      console.error('Error al cargar los detalles del libro:', error);
       message.error('Error al cargar los detalles del libro');
       navigate('/');
     } finally {
@@ -56,6 +80,10 @@ const BookDetails: React.FC = () => {
     }
   };
 
+  /**
+   * Obtiene las reseñas del libro desde el servicio
+   * @param bookId ID del libro a consultar
+   */
   const fetchBookReviews = async (bookId: string) => {
     try {
       setReviewsLoading(true);
@@ -64,16 +92,22 @@ const BookDetails: React.FC = () => {
       
       // Verificar si el usuario actual tiene una reseña
       if (isAuthenticated && user) {
-        const currentUserReview = data.find(review => review.userId === user.id);
+        const currentUserReview = data.find(review => review.userId === parseInt(user.id));
         setUserReview(currentUserReview || null);
       }
     } catch (error) {
+      console.error('Error al cargar las reseñas:', error);
       message.error('Error al cargar las reseñas');
     } finally {
       setReviewsLoading(false);
     }
   };
 
+  /**
+   * Maneja la creación de una nueva reseña
+   * @param rating Calificación de la reseña
+   * @param comment Comentario de la reseña
+   */
   const handleCreateReview = async (rating: number, comment: string) => {
     if (!id) return;
     
@@ -88,32 +122,45 @@ const BookDetails: React.FC = () => {
       // Actualizar los detalles del libro (promedio de calificaciones, etc.)
       fetchBookDetails(id);
     } catch (error) {
+      console.error('Error al enviar la reseña:', error);
       message.error('Error al enviar la reseña');
     }
   };
 
+  /**
+   * Maneja la actualización de una reseña existente
+   * @param reviewId ID de la reseña a actualizar
+   * @param rating Nueva calificación
+   * @param comment Nuevo comentario
+   */
   const handleUpdateReview = async (reviewId: string, rating: number, comment: string) => {
+    if (!id) return;
+    
     try {
-      const updatedReview = await updateReview(reviewId, { rating, comment });
+      // Pasar el bookId como tercer parámetro a updateReview
+      const updatedReview = await updateReview(reviewId, { rating, comment }, id);
       message.success('Reseña actualizada correctamente');
       
       // Actualizar las reseñas y el userReview
       setReviews(prevReviews => 
         prevReviews.map(review => 
-          review.id === reviewId ? updatedReview : review
+          review.id === parseInt(reviewId) ? updatedReview : review
         )
       );
       setUserReview(updatedReview);
       
       // Actualizar los detalles del libro (promedio de calificaciones, etc.)
-      if (id) {
-        fetchBookDetails(id);
-      }
+      fetchBookDetails(id);
     } catch (error) {
+      console.error('Error al actualizar la reseña:', error);
       message.error('Error al actualizar la reseña');
     }
   };
 
+  /**
+   * Maneja la eliminación de una reseña
+   * @param reviewId ID de la reseña a eliminar
+   */
   const handleDeleteReview = async (reviewId: string) => {
     try {
       await deleteReview(reviewId);
@@ -121,7 +168,7 @@ const BookDetails: React.FC = () => {
       
       // Actualizar las reseñas y el userReview
       setReviews(prevReviews => 
-        prevReviews.filter(review => review.id !== reviewId)
+        prevReviews.filter(review => review.id !== parseInt(reviewId))
       );
       setUserReview(null);
       
@@ -130,27 +177,30 @@ const BookDetails: React.FC = () => {
         fetchBookDetails(id);
       }
     } catch (error) {
+      console.error('Error al eliminar la reseña:', error);
       message.error('Error al eliminar la reseña');
     }
   };
 
+  // Mostrar spinner mientras se cargan los datos
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', margin: '100px 0' }}>
+      <div className="book-loading-container">
         <Spin size="large" />
       </div>
     );
   }
 
+  // Si no hay datos del libro, no mostramos nada
   if (!book) {
     return null;
   }
 
   return (
-    <div>
+    <div className="book-details-container">
       <Button
         icon={<ArrowLeftOutlined />}
-        style={{ marginBottom: 16 }}
+        className="back-button"
         onClick={() => navigate(-1)}
       >
         Volver
@@ -159,108 +209,116 @@ const BookDetails: React.FC = () => {
       <Row gutter={[32, 32]}>
         {/* Columna izquierda: Imagen y detalles básicos */}
         <Col xs={24} md={8} lg={6}>
-          <Image
-            src={book.coverImage || 'https://via.placeholder.com/300x450?text=No+Image'}
-            alt={book.title}
-            style={{ width: '100%', maxWidth: '300px', borderRadius: '8px' }}
-            fallback="https://via.placeholder.com/300x450?text=No+Image"
-          />
+          <div className="book-cover-container">
+            <BookImage
+              src={book.coverImageUrl}
+              alt={book.title}
+              width="100%"
+              borderRadius="8px"
+              className="book-cover-image"
+            />
+          </div>
           
-          <Card style={{ marginTop: 16 }}>
-            <div style={{ textAlign: 'center', marginBottom: 16 }}>
-              <Rate disabled value={book.averageRating} allowHalf />
-              <Text style={{ display: 'block' }}>
+          <Card className="book-info-card">
+            <div className="book-rating-container">
+              <Rate disabled value={book.averageRating} allowHalf className="book-rating" />
+              <Text className="book-rating-text">
                 {book.averageRating.toFixed(1)} de 5 ({book.reviewCount} reseñas)
               </Text>
             </div>
-            
-            {book.category && (
+            {book.categoryName && (
               <Button
                 icon={<BookOutlined />}
-                style={{ width: '100%', marginBottom: 8 }}
-                onClick={() => navigate(`/?category=${encodeURIComponent(book.category)}`)}
+                className="book-category-button"
+                onClick={() => navigate(`/?category=${encodeURIComponent(book.categoryName!)}`)}
               >
-                {book.category}
+                {book.categoryName}
               </Button>
             )}
-            
-            {/* Aquí podrían ir más acciones como "Añadir a favoritos", etc. */}
           </Card>
         </Col>
         
         {/* Columna derecha: Detalles del libro y reseñas */}
         <Col xs={24} md={16} lg={18}>
-          <Title level={2}>{book.title}</Title>
-          <Title level={4} type="secondary" style={{ marginTop: 0 }}>
-            {book.author}
-          </Title>
-          
-          <Tabs defaultActiveKey="info">
-            <TabPane
-              tab={<span><ReadOutlined /> Información</span>}
-              key="info"
-            >
-              {/* Resumen del libro */}
-              <div style={{ marginBottom: 24 }}>
-                <Title level={4}>Resumen</Title>
-                <Text>{book.summary}</Text>
-              </div>
-              
-              {/* Detalles adicionales */}
-              <Title level={4}>Detalles</Title>
-              <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-                {book.publisher && (
-                  <Descriptions.Item label="Editorial">{book.publisher}</Descriptions.Item>
-                )}
-                {book.publishedYear && (
-                  <Descriptions.Item label="Año de publicación">{book.publishedYear}</Descriptions.Item>
-                )}
-                {book.isbn && (
-                  <Descriptions.Item label="ISBN">{book.isbn}</Descriptions.Item>
-                )}
-                {book.pages && (
-                  <Descriptions.Item label="Páginas">{book.pages}</Descriptions.Item>
-                )}
-                {book.language && (
-                  <Descriptions.Item label="Idioma">{book.language}</Descriptions.Item>
-                )}
-              </Descriptions>
-            </TabPane>
+          <div className="book-main-content">
+            <Title level={2} className="book-title">{book.title}</Title>
+            <Title level={4} type="secondary" className="book-author">
+              {book.author}
+            </Title>
             
-            <TabPane
-              tab={<span><BookOutlined /> Reseñas ({book.reviewCount})</span>}
-              key="reviews"
-            >
-              {/* Formulario para agregar o editar reseña */}
-              {!userReview ? (
-                <Card title="Deja tu reseña" style={{ marginBottom: 24 }}>
-                  <ReviewForm
-                    bookId={id}
-                    onSubmit={handleCreateReview}
-                  />
-                </Card>
-              ) : (
-                <Card title="Tu reseña" style={{ marginBottom: 24 }}>
+            <Tabs defaultActiveKey="info" className="book-tabs">
+              <TabPane
+                tab={<span><ReadOutlined /> Información</span>}
+                key="info"
+              >
+                {/* Resumen del libro */}
+                <div className="book-summary-container">
+                  <Title level={4} className="book-summary-title">Resumen</Title>
+                  <Paragraph className="book-summary-text">{book.summary}</Paragraph>
+                </div>
+                
+                {/* Detalles adicionales */}
+                <div className="book-details-section">
+                  <Title level={4} className="book-details-title">Detalles</Title>
+                  <Descriptions bordered column={{ xs: 1, sm: 2 }} className="book-details-table">
+                    {book.publisher && (
+                      <Descriptions.Item label="Editorial">{book.publisher}</Descriptions.Item>
+                    )}
+                    {book.publishedYear && (
+                      <Descriptions.Item label="Año de publicación">{book.publishedYear}</Descriptions.Item>
+                    )}
+                    {book.isbn && (
+                      <Descriptions.Item label="ISBN">{book.isbn}</Descriptions.Item>
+                    )}
+                    {book.pages && (
+                      <Descriptions.Item label="Páginas">{book.pages}</Descriptions.Item>
+                    )}
+                    {book.language && (
+                      <Descriptions.Item label="Idioma">{book.language}</Descriptions.Item>
+                    )}
+                  </Descriptions>
+                </div>
+              </TabPane>
+              
+              <TabPane
+                tab={<span><BookOutlined /> Reseñas ({book.reviewCount})</span>}
+                key="reviews"
+              >
+                <div className="book-reviews-container">
+                  {/* Formulario para agregar o editar reseña */}
+                  {isAuthenticated && (
+                    !userReview ? (
+                      <Card title="Deja tu reseña" className="user-review-card">
+                        <ReviewForm
+                          bookId={id || ''}
+                          onSubmit={handleCreateReview}
+                        />
+                      </Card>
+                    ) : (
+                      <Card title="Tu reseña" className="user-review-card">
+                        <ReviewList
+                          reviews={[userReview]}
+                          onDeleteReview={handleDeleteReview}
+                          onUpdateReview={handleUpdateReview}
+                        />
+                      </Card>
+                    )
+                  )}
+                  
+                  <Divider className="reviews-divider" />
+                  
+                  {/* Lista de reseñas */}
+                  <Title level={4} className="all-reviews-title">Todas las reseñas</Title>
                   <ReviewList
-                    reviews={[userReview]}
-                    onDeleteReview={handleDeleteReview}
-                    onUpdateReview={handleUpdateReview}
+                    reviews={reviews.filter(review => !userReview || review.id !== userReview.id)}
+                    loading={reviewsLoading}
+                    onDeleteReview={isAuthenticated ? handleDeleteReview : undefined}
+                    onUpdateReview={isAuthenticated ? handleUpdateReview : undefined}
                   />
-                </Card>
-              )}
-              
-              <Divider />
-              
-              {/* Lista de reseñas */}
-              <Title level={4}>Todas las reseñas</Title>
-              <ReviewList
-                reviews={reviews.filter(review => !userReview || review.id !== userReview.id)}
-                loading={reviewsLoading}
-                onDeleteReview={isAuthenticated ? handleDeleteReview : undefined}
-                onUpdateReview={isAuthenticated ? handleUpdateReview : undefined}
-              />
-            </TabPane>
-          </Tabs>
+                </div>
+              </TabPane>
+            </Tabs>
+          </div>
         </Col>
       </Row>
     </div>

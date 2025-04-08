@@ -1,0 +1,192 @@
+
+:root {
+    --primary-color: #1890ff;
+    --primary-color-hover: #40a9ff;
+    --secondary-color: #13c2c2;
+    --border-radius: 8px;
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+    --transition-normal: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  }
+  
+  .review-form {
+    width: 100%;
+    background-color: #fff;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-normal);
+  }
+  
+  .review-form:hover {
+    box-shadow: var(--shadow-md);
+  }
+  
+  .review-form-title {
+    margin-bottom: 20px !important;
+    color: var(--text-color, rgba(0, 0, 0, 0.85));
+  }
+  
+  .review-form-item {
+    margin-bottom: 16px;
+  }
+  
+  .review-form-item .ant-form-item-label > label {
+    font-weight: 500;
+    color: var(--text-color, rgba(0, 0, 0, 0.85));
+    transition: var(--transition-normal);
+  }
+  
+  .review-rating-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .review-rating {
+    font-size: 24px;
+  }
+  
+  .review-rating-text {
+    margin-left: 12px;
+    color: var(--text-color-secondary, rgba(0, 0, 0, 0.45));
+    transition: var(--transition-normal);
+  }
+  
+  .review-form-textarea {
+    resize: vertical;
+    min-height: 120px;
+    border-radius: var(--border-radius);
+    transition: var(--transition-normal);
+  }
+  
+  .review-form-textarea:hover {
+    border-color: var(--primary-color);
+  }
+  
+  .review-form-textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+  
+  .review-form-buttons {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .review-submit-button {
+    min-width: 120px;
+    border-radius: var(--border-radius);
+    height: 40px;
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .review-submit-button:hover {
+    background-color: var(--primary-color-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .review-cancel-button {
+    min-width: 100px;
+    border-radius: var(--border-radius);
+    height: 40px;
+    transition: var(--transition-normal);
+  }
+  
+  .review-cancel-button:hover {
+    transform: translateY(-2px);
+  }
+  
+  .review-login-container {
+    text-align: center;
+    margin: 30px 0;
+    padding: 24px;
+    background-color: #f9f9f9;
+    border-radius: var(--border-radius);
+    border: 1px dashed #d9d9d9;
+    transition: var(--transition-normal);
+  }
+  
+  .review-login-container:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .review-login-title {
+    color: var(--text-color, rgba(0, 0, 0, 0.85));
+    margin-bottom: 16px !important;
+  }
+  
+  .review-login-button {
+    min-width: 140px;
+    height: 40px;
+    border-radius: var(--border-radius);
+    transition: var(--transition-normal);
+  }
+  
+  .review-login-button:hover {
+    background-color: var(--primary-color-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  /* Estilos responsivos */
+  @media (max-width: 768px) {
+    .review-form {
+      padding: 16px;
+    }
+    
+    .review-rating {
+      font-size: 20px;
+    }
+    
+    .review-form-buttons {
+      flex-direction: column;
+    }
+    
+    .review-submit-button,
+    .review-cancel-button {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+  }
+  
+  /* Ajustes para modo oscuro */
+  .dark-mode .review-form {
+    background-color: #1f1f1f;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dark-mode .review-form-title,
+  .dark-mode .review-form-item .ant-form-item-label > label {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  
+  .dark-mode .review-rating-text {
+    color: rgba(255, 255, 255, 0.45);
+  }
+  
+  .dark-mode .review-form-textarea {
+    background-color: #2d2d2d;
+    border-color: #434343;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  
+  .dark-mode .review-form-textarea:hover {
+    border-color: var(--primary-color);
+  }
+  
+  .dark-mode .review-login-container {
+    background-color: #2d2d2d;
+    border-color: #434343;
+  }
+  
+  .dark-mode .review-login-container:hover {
+    background-color: #3a3a3a;
+  }
+  
+  .dark-mode .review-login-title {
+    color: rgba(255, 255, 255, 0.85);
+  }
