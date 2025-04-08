@@ -1,0 +1,262 @@
+/* BookManager.css - Estilos para la gestión de libros */
+
+:root {
+  --primary-color: #1890ff;
+  --primary-color-hover: #40a9ff;
+  --secondary-color: #13c2c2;
+  --border-radius: 8px;
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --transition-normal: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.book-manager {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+/* Botón de volver */
+.back-button {
+  margin-bottom: 24px;
+  transition: var(--transition-normal);
+  display: flex;
+  align-items: center;
+}
+
+.back-button:hover {
+  transform: translateX(-3px);
+}
+
+/* Encabezado de la página - REORGANIZADO */
+.book-manager-header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.book-manager-title {
+  margin: 0 0 24px 0 !important;
+  color: var(--text-color, rgba(0, 0, 0, 0.85));
+  transition: color 0.3s ease;
+}
+
+/* Contenedor del botón de crear centrado */
+.book-manager-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.create-button {
+  min-width: 180px;
+  height: 40px;
+  border-radius: var(--border-radius);
+  background-color: var(--primary-color, #1890ff);
+  transition: var(--transition-normal);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.create-button:hover {
+  background-color: var(--primary-color-hover, #40a9ff);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.create-button .anticon {
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+/* Estilos de la tabla */
+.books-card {
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: var(--transition-normal);
+  background-color: var(--bg-component, #fff);
+}
+
+.books-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.books-table {
+  width: 100%;
+}
+
+.books-table .ant-table-thead > tr > th {
+  background-color: var(--table-header-bg, #fafafa);
+  color: var(--text-color, rgba(0, 0, 0, 0.85));
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.books-table .book-cover-cell {
+  display: flex;
+  justify-content: center;
+}
+
+.books-table .book-title-cell {
+  font-weight: 500;
+}
+
+/* Botones de acción en la tabla */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.action-button {
+  transition: var(--transition-normal);
+  border-radius: var(--border-radius);
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+}
+
+.view-button:hover {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.edit-button:hover {
+  background-color: var(--primary-color-hover);
+}
+
+.delete-button:hover {
+  background-color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+/* Estilos para access denied */
+.access-denied {
+  text-align: center;
+  padding: 50px 0;
+  background-color: var(--bg-component, #fff);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-normal);
+  max-width: 500px;
+  margin: 50px auto;
+}
+
+.access-denied:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.access-denied-title {
+  color: var(--text-color, rgba(0, 0, 0, 0.85));
+  margin-bottom: 16px;
+  transition: color 0.3s ease;
+}
+
+.access-denied-text {
+  color: var(--text-color-secondary, rgba(0, 0, 0, 0.45));
+  font-size: 16px;
+  transition: color 0.3s ease;
+}
+
+.access-denied-button {
+  margin-top: 24px;
+}
+
+/* Drawer estilos */
+.book-drawer .ant-drawer-header {
+  background-color: var(--bg-component, #fff);
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
+  transition: var(--transition-normal);
+}
+
+.book-drawer .ant-drawer-title {
+  color: var(--text-color, rgba(0, 0, 0, 0.85));
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.book-drawer .ant-drawer-body {
+  background-color: var(--bg-component, #fff);
+  transition: background-color 0.3s ease;
+  padding: 24px;
+}
+
+/* Estilos responsivos */
+@media (max-width: 992px) {
+  .book-manager {
+    padding: 20px 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .book-manager {
+    padding: 16px 8px;
+  }
+  
+  .book-manager-title {
+    font-size: 22px !important;
+  }
+  
+  .books-table .action-buttons {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 576px) {
+  .book-drawer {
+    width: 100% !important;
+  }
+  
+  .book-manager-title {
+    font-size: 20px !important;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .action-button {
+    padding: 0 8px;
+    height: 28px;
+    font-size: 12px;
+  }
+}
+
+/* Ajustes para modo oscuro */
+.dark-mode .books-table .ant-table-thead > tr > th {
+  background-color: var(--table-header-bg, #1f2937);
+}
+
+.dark-mode .access-denied {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background-color: #1f1f1f;
+}
+
+.dark-mode .book-manager-title,
+.dark-mode .access-denied-title {
+  color: var(--text-color, rgba(255, 255, 255, 0.85));
+}
+
+.dark-mode .access-denied-text {
+  color: var(--text-color-secondary, rgba(255, 255, 255, 0.45));
+}
+
+.dark-mode .book-drawer .ant-drawer-header {
+  background-color: #1f1f1f;
+  border-bottom: 1px solid var(--border-color, #303030);
+}
+
+.dark-mode .book-drawer .ant-drawer-title {
+  color: var(--text-color, rgba(255, 255, 255, 0.85));
+}
+
+.dark-mode .book-drawer .ant-drawer-body {
+  background-color: #1f1f1f;
+}
+
+.dark-mode .books-card {
+  background-color: #1f1f1f;
+}

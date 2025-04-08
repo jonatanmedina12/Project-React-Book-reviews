@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Typography, Divider, message } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Form, Input, Button, Typography, Divider, message, Checkbox } from 'antd';
 import { 
   LockOutlined, 
   MailOutlined, 
@@ -17,14 +17,32 @@ const { Title, Text } = Typography;
  * Login Component
  * 
  * Modern design inspired by Jam's login page with enhanced styling
+ * Includes "Remember Me" functionality
  */
 const Login: React.FC = () => {
   // Get authentication context
-  const { login, isAuthenticated, loading } = useAuth();
+  const { 
+    login, 
+    isAuthenticated, 
+    loading, 
+    hasRememberedCredentials, 
+    rememberedEmail 
+  } = useAuth();
   
   // Form state management
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(hasRememberedCredentials);
+
+  // Rellenar el formulario con credenciales guardadas al cargar
+  useEffect(() => {
+    if (hasRememberedCredentials && rememberedEmail) {
+      form.setFieldsValue({
+        email: rememberedEmail,
+        rememberMe: true
+      });
+    }
+  }, [form, hasRememberedCredentials, rememberedEmail]);
 
   // Redirect if already authenticated
   if (isAuthenticated) {
@@ -33,12 +51,16 @@ const Login: React.FC = () => {
 
   /**
    * Handle form submission
-   * @param values - Form values containing email and password
+   * @param values - Form values containing email, password and rememberMe
    */
-  const handleSubmit = async (values: { email: string; password: string }) => {
+  const handleSubmit = async (values: { 
+    email: string; 
+    password: string;
+    rememberMe?: boolean;
+  }) => {
     try {
       setSubmitting(true);
-      await login(values.email, values.password);
+      await login(values.email, values.password, values.rememberMe);
       message.success('¡Inicio de sesión exitoso!');
     } catch (error) {
       console.error('Error de inicio de sesión:', error);
@@ -46,6 +68,13 @@ const Login: React.FC = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  /**
+   * Handle remember me checkbox change
+   */
+  const handleRememberMeChange = (e: any) => {
+    setRememberMe(e.target.checked);
   };
 
   /**
@@ -80,6 +109,10 @@ const Login: React.FC = () => {
             onFinish={handleSubmit}
             autoComplete="off"
             className="modern-login-form"
+            initialValues={{ 
+              email: rememberedEmail, 
+              rememberMe: hasRememberedCredentials 
+            }}
           >
             <Form.Item
               name="email"
@@ -110,6 +143,15 @@ const Login: React.FC = () => {
               />
             </Form.Item>
 
+            <Form.Item name="rememberMe" valuePropName="checked">
+              <Checkbox
+                onChange={handleRememberMeChange}
+                className="modern-checkbox"
+              >
+                Recordar mis credenciales
+              </Checkbox>
+            </Form.Item>
+
             <Form.Item>
               <Button
                 type="primary"
@@ -123,6 +165,10 @@ const Login: React.FC = () => {
               </Button>
             </Form.Item>
           </Form>
+
+          <div className="modern-login-links">
+            <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+          </div>
 
           <div className="modern-divider">
             <Divider>O</Divider>

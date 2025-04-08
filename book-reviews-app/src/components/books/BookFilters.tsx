@@ -1,147 +1,135 @@
+
 import React, { useState, useEffect } from 'react';
-import { Select, Space, Form, Input, Button, Divider } from 'antd';
-import { SearchOutlined, FilterOutlined, ReloadOutlined } from '@ant-design/icons';
-import { getCategories } from '../../services/bookService';
-import './BooksComponents.css';
+import { Input, Select, Row, Col, Form, Button } from 'antd';
+import { SearchOutlined, ClearOutlined } from '@ant-design/icons';
+import { getCategories } from '../../services/categoryService';
+import { Category } from '../../types/Category';
+import './css/BookComponents.css';
 
 const { Option } = Select;
 
+// Interfaz que define las propiedades del componente
 interface BookFiltersProps {
   onSearch: (search: string) => void;
   onCategoryChange: (category: string) => void;
   defaultSearch?: string;
   defaultCategory?: string;
+  className?: string;
 }
 
 /**
- * Componente para filtrar y buscar libros
- * Utiliza estilos modernos que coinciden con el diseño del login
+ * Componente para filtrar libros por título y categoría
+ * Sigue el principio de responsabilidad única (SRP) para los filtros de búsqueda
  */
 const BookFilters: React.FC<BookFiltersProps> = ({
   onSearch,
   onCategoryChange,
   defaultSearch = '',
   defaultCategory = '',
+  className = '',
 }) => {
-  // Estado local
-  const [categories, setCategories] = useState<string[]>([]);
-  const [search, setSearch] = useState<string>(defaultSearch);
-  const [category, setCategory] = useState<string>(defaultCategory);
+  const [form] = Form.useForm();
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  /**
-   * Cargar categorías al montar el componente
-   */
+  // Cargar categorías al montar el componente
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setLoading(true);
-        const data = await getCategories();
-        setCategories(data);
-      } catch (error) {
-        console.error('Error al cargar categorías:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCategories();
   }, []);
 
+  // Establecer valores iniciales cuando cambian las props
+  useEffect(() => {
+    form.setFieldsValue({
+      search: defaultSearch,
+      category: defaultCategory || undefined,
+    });
+  }, [defaultSearch, defaultCategory, form]);
+
   /**
-   * Maneja cambios en el campo de búsqueda
+   * Obtiene las categorías desde el servicio
    */
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const data = await getCategories();
+      setCategories(data);
+    } catch (error) {
+      console.error('Error al cargar categorías:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   /**
-   * Maneja cambios en la selección de categoría
+   * Maneja el envío del formulario
+   * @param values Valores del formulario
    */
-  const handleCategoryChange = (value: string) => {
-    setCategory(value);
-    onCategoryChange(value);
-  };
-
-  /**
-   * Aplica los filtros de búsqueda
-   */
-  const handleSearch = () => {
+  const handleSubmit = (values: { search: string; category: string }) => {
+    const { search, category } = values;
     onSearch(search);
+    onCategoryChange(category || '');
   };
 
   /**
-   * Restablece todos los filtros
+   * Limpia todos los filtros
    */
-  const handleReset = () => {
-    setSearch('');
-    setCategory('');
+  const handleClear = () => {
+    form.resetFields();
     onSearch('');
     onCategoryChange('');
   };
 
   return (
-    <div className="modern-filters-container">
-      <Form layout="vertical" style={{ marginBottom: 0 }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-          <Form.Item
-            label="Buscar libros"
-            className="modern-filters-form-item"
-            style={{ flex: 2, minWidth: '250px' }}
-          >
+    <Form
+      form={form}
+      onFinish={handleSubmit}
+      layout="vertical"
+      className={className}
+      style={{ marginBottom: '24px' }}
+      initialValues={{
+        search: defaultSearch,
+        category: defaultCategory || undefined,
+      }}
+    >
+      <Row gutter={16}>
+        <Col xs={24} sm={12} md={8} lg={8}>
+          <Form.Item name="search" label="Buscar por título o autor">
             <Input
-              className="modern-input-search"
-              prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-              placeholder="Título, autor..."
-              value={search}
-              onChange={handleSearchChange}
-              onPressEnter={handleSearch}
+              placeholder="Buscar libros..."
+              allowClear
+              prefix={<SearchOutlined />}
             />
           </Form.Item>
-          <Form.Item
-            label="Categoría"
-            className="modern-filters-form-item"
-            style={{ flex: 1, minWidth: '200px' }}
-          >
+        </Col>
+        
+        <Col xs={24} sm={12} md={8} lg={8}>
+          <Form.Item name="category" label="Categoría">
             <Select
-              className="modern-select"
               placeholder="Selecciona una categoría"
-              style={{ width: '100%' }}
-              value={category || undefined}
-              onChange={handleCategoryChange}
-              loading={loading}
               allowClear
+              loading={loading}
             >
-              {categories.map((cat) => (
-                <Option key={cat} value={cat}>
-                  {cat}
+              {categories.map(category => (
+                <Option key={category.id} value={category.id.toString()}>
+                  {category.name}
                 </Option>
               ))}
             </Select>
           </Form.Item>
-          <Form.Item label=" " style={{ alignSelf: 'flex-end' }}>
-            <Space>
-              <Button
-                type="primary"
-                icon={<FilterOutlined />}
-                onClick={handleSearch}
-                className="modern-filter-button"
-              >
-                Filtrar
-              </Button>
-              <Button 
-                onClick={handleReset} 
-                className="modern-reset-button"
-                icon={<ReloadOutlined />}
-              >
-                Limpiar
-              </Button>
-            </Space>
+        </Col>
+        
+        <Col xs={24} sm={24} md={8} lg={8} style={{ display: 'flex', alignItems: 'flex-end' }}>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" icon={<SearchOutlined />} style={{ marginRight: 8 }}>
+              Filtrar
+            </Button>
+            <Button icon={<ClearOutlined />} onClick={handleClear}>
+              Limpiar
+            </Button>
           </Form.Item>
-        </div>
-        <Divider style={{ margin: '8px 0 0 0' }} />
-      </Form>
-    </div>
+        </Col>
+      </Row>
+    </Form>
   );
 };
 

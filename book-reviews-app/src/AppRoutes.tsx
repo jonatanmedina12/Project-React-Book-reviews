@@ -11,6 +11,8 @@ import NotFound from './pages/NotFound/NotFound';
 
 // Importación de componentes de layout
 import MainLayout from './components/layout/MainLayout';
+import PrivateRoute from './context/PrivateRoute';
+import BookManager from './components/books/BookManager';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -24,6 +26,15 @@ const AppRoutes: React.FC = () => {
         <Route index element={<Home />} />
         <Route path="books/:id" element={<BookDetails />} />
         <Route path="profile" element={<Profile />} />
+          {/* Ruta de administración de libros (solo para administradores) */}
+          <Route 
+          path="books/manage" 
+          element={
+            <PrivateRoute roles={['Admin']}>
+              <BookManager />
+            </PrivateRoute>
+          } 
+        />
       </Route>
       
       {/* Ruta 404 */}

@@ -1,3 +1,7 @@
+/**
+ * @file Home.tsx
+ * @description Página principal que muestra la lista de libros con filtros y paginación
+ */
 import React, { useEffect, useState } from 'react';
 import { Typography, Spin } from 'antd';
 import { useSearchParams } from 'react-router-dom';
@@ -8,6 +12,10 @@ import { Book } from '../../types/Book';
 
 const { Title } = Typography;
 
+/**
+ * Componente de la página principal
+ * Sigue el principio de responsabilidad única (SRP) para la página principal
+ */
 const Home: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [books, setBooks] = useState<Book[]>([]);
@@ -20,15 +28,20 @@ const Home: React.FC = () => {
   const search = searchParams.get('search') || '';
   const category = searchParams.get('category') || '';
 
+  // Cargar libros cuando cambian los filtros o la página
   useEffect(() => {
     fetchBooks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, search, category]);
 
+  /**
+   * Obtiene los libros desde el servicio con los filtros aplicados
+   */
   const fetchBooks = async () => {
     try {
       setLoading(true);
-      const data = await getBooks(page, pageSize, search, category);
+      const categoryId = category ? parseInt(category) : undefined;
+      const data = await getBooks(page, pageSize, search, categoryId);
       setBooks(data.books);
       setTotal(data.total);
     } catch (error) {
@@ -38,11 +51,19 @@ const Home: React.FC = () => {
     }
   };
 
+  /**
+   * Maneja el cambio de página
+   * @param newPage Número de la nueva página
+   */
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     window.scrollTo(0, 0);
   };
 
+  /**
+   * Maneja la búsqueda por texto
+   * @param searchValue Texto a buscar
+   */
   const handleSearch = (searchValue: string) => {
     const params = new URLSearchParams(searchParams);
     if (searchValue) {
@@ -55,6 +76,10 @@ const Home: React.FC = () => {
     setPage(1);
   };
 
+  /**
+   * Maneja el cambio de categoría
+   * @param categoryValue ID de la categoría seleccionada
+   */
   const handleCategoryChange = (categoryValue: string) => {
     const params = new URLSearchParams(searchParams);
     if (categoryValue) {

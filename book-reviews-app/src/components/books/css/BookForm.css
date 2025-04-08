@@ -1,0 +1,219 @@
+/* BookForm.css - Estilos modernos para el formulario de creación y edición de libros */
+
+:root {
+  --primary-color: #1890ff;
+  --secondary-color: #13c2c2;
+  --border-radius: 8px;
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --transition-normal: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+/* Estilos generales del formulario */
+.book-form {
+  width: 100%;
+  background-color: #fff;
+  border-radius: var(--border-radius);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Contenedor principal de la imagen de portada */
+.book-cover-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 67%;
+  padding: 16px;
+  border-radius: var(--border-radius);
+  background-color: #fafafa;
+  transition: var(--transition-normal);
+}
+
+/* Previsualización de la portada del libro */
+.book-cover-preview {
+  width: 100%;
+  aspect-ratio: 2/3;
+  position: relative;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  background-color: #f5f5f5;
+  transition: var(--transition-normal);
+  margin-bottom: 16px;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-cover-preview:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+}
+
+.book-cover-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition-normal);
+}
+
+/* Componente de carga de imagen */
+:global(.ant-upload.ant-upload-select-picture-card) {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 2/3;
+  border-radius: var(--border-radius);
+  border: 2px dashed #d9d9d9;
+  background-color: #fafafa;
+  overflow: hidden;
+}
+
+:global(.ant-upload-list-picture-card-container) {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 2/3;
+  margin: 0;
+}
+
+/* Estilos para los campos del formulario */
+.book-form-item {
+  margin-bottom: 24px;
+}
+
+.book-form-item .ant-form-item-label > label {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+  transition: var(--transition-normal);
+}
+
+.book-form-input {
+  transition: var(--transition-normal);
+  border-radius: var(--border-radius);
+}
+
+.book-form-input:hover {
+  border-color: var(--primary-color);
+}
+
+.book-form-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.book-form-textarea {
+  resize: vertical;
+  min-height: 120px;
+  border-radius: var(--border-radius);
+}
+
+/* Botones de acción */
+.book-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 32px;
+  gap: 12px;
+}
+
+.book-form-button {
+  min-width: 150px;
+  height: 40px;
+  border-radius: var(--border-radius);
+  transition: var(--transition-normal);
+  font-weight: 500;
+}
+
+.book-form-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Ajustes específicos para el componente BookImageUpload */
+.book-cover-container :global(.upload-image-container) {
+  width: 100%;
+  height: 100%;
+}
+
+.book-cover-container :global(.ant-upload-select) {
+  width: 100% !important;
+  height: auto !important;
+}
+
+.book-cover-container :global(.ant-upload-list) {
+  width: 100%;
+}
+
+/* Estilos responsivos */
+@media (max-width: 992px) {
+  .book-form {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .book-cover-container {
+    margin-bottom: 24px;
+    height: auto;
+  }
+  
+  .book-cover-preview {
+    max-width: 250px;
+    margin: 0 auto 16px;
+  }
+  
+  .book-form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+  
+  .book-form-button {
+    margin: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .book-form {
+    padding: 16px;
+  }
+  
+  .book-cover-preview {
+    max-width: 200px;
+  }
+  
+  .book-form-item {
+    margin-bottom: 16px;
+  }
+}
+
+/* Ajustes para modo oscuro (si lo utilizas) */
+.dark-mode .book-form {
+  background-color: #1f1f1f;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .book-cover-container {
+  background-color: #2d2d2d;
+}
+
+.dark-mode .book-cover-preview {
+  background-color: #383838;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .book-form-item .ant-form-item-label > label {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.dark-mode :global(.ant-upload.ant-upload-select-picture-card) {
+  background-color: #2d2d2d;
+  border-color: #444;
+}
+
+.dark-mode .book-form-input,
+.dark-mode .book-form-textarea {
+  background-color: #2d2d2d;
+  border-color: #444;
+  color: rgba(255, 255, 255, 0.85);
+}

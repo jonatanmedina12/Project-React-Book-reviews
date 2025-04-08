@@ -1,18 +1,19 @@
-// src/components/reviews/ReviewList.tsx
 import React, { useState } from 'react';
-import { List, Avatar, Rate, Typography, Space, Divider, Button, Popconfirm, Empty } from 'antd';
-import { UserOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { List, Rate, Typography, Space, Divider, Button, Popconfirm, Empty } from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import 'moment/locale/es';
 import { Review } from '../../types/Review';
 import { useAuth } from '../../context/AuthContext';
 import ReviewForm from './ReviewForm';
-import './ReviewsComponents.css';
+import './css/ReviewList.css';
 
 const { Text, Paragraph, Title } = Typography;
 
+// Configuramos el locale para moment
 moment.locale('es');
 
+// Interfaz para las propiedades del componente
 interface ReviewListProps {
   reviews: Review[];
   bookId?: string;
@@ -23,8 +24,8 @@ interface ReviewListProps {
 }
 
 /**
- * Componente para mostrar una lista de reseñas
- * Con estilo moderno que coincide con el diseño del sistema
+ * Componente para mostrar una lista de reseñas con funcionalidades de edición y eliminación
+ * Sigue el principio de responsabilidad única (SRP) para manejar la visualización y edición de reseñas
  */
 const ReviewList: React.FC<ReviewListProps> = ({
   reviews,
@@ -35,12 +36,13 @@ const ReviewList: React.FC<ReviewListProps> = ({
   showBookInfo = false,
 }) => {
   const { user } = useAuth();
-  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
 
   /**
    * Maneja el clic en el botón de editar
+   * @param reviewId ID de la reseña a editar
    */
-  const handleEditClick = (reviewId: string) => {
+  const handleEditClick = (reviewId: number) => {
     setEditingReviewId(reviewId);
   };
 
@@ -53,43 +55,82 @@ const ReviewList: React.FC<ReviewListProps> = ({
 
   /**
    * Maneja la actualización de una reseña
+   * @param reviewId ID de la reseña a actualizar
+   * @param rating Nueva calificación
+   * @param comment Nuevo comentario
    */
-  const handleUpdateReview = async (reviewId: string, rating: number, comment: string) => {
+  const handleUpdateReview = async (reviewId: number, rating: number, comment: string) => {
     if (onUpdateReview) {
-      await onUpdateReview(reviewId, rating, comment);
+      // Convertir reviewId a string para la llamada a la API
+      await onUpdateReview(reviewId.toString(), rating, comment);
       setEditingReviewId(null);
     }
   };
 
-  // Si no hay reseñas, mostrar mensaje vacío estilizado
+  // Si no hay reseñas, mostramos un mensaje
   if (!loading && reviews.length === 0) {
     return (
-      <div className="modern-reviews-container">
-        <Title level={4} className="modern-reviews-title">Reseñas</Title>
+      <div className="review-list-container">
         <Empty
-          className="modern-empty-reviews"
           description="No hay reseñas disponibles"
           image={Empty.PRESENTED_IMAGE_SIMPLE}
+          className="review-list-empty"
         />
       </div>
     );
   }
 
   return (
-    <div className="modern-reviews-container">
-      <Title level={4} className="modern-reviews-title">Reseñas</Title>
+    <div className="review-list-container">
       <List
         itemLayout="vertical"
         dataSource={reviews}
         loading={loading}
+        className="review-list"
         renderItem={(review) => {
-          const isCurrentUserReview = user?.id === review.userId;
+          // Convertir user.id a número para comparar con review.userId
+          const isCurrentUserReview = user ? parseInt(user.id) === review.userId : false;
           const isEditing = editingReviewId === review.id;
 
           return (
-            <div className="modern-review-item">
+            <List.Item
+              key={review.id}
+              actions={
+                isCurrentUserReview && !isEditing
+                  ? [
+                      <div className="review-action-buttons" key="actions">
+                        <Button
+                          key="edit"
+                          type="text"
+                          icon={<EditOutlined />}
+                          onClick={() => handleEditClick(review.id)}
+                          className="review-action-btn review-edit-btn"
+                        >
+                          Editar
+                        </Button>
+                        <Popconfirm
+                          key="delete"
+                          title="¿Estás seguro que deseas eliminar esta reseña?"
+                          onConfirm={() => onDeleteReview && onDeleteReview(review.id.toString())}
+                          okText="Sí"
+                          cancelText="No"
+                        >
+                          <Button 
+                            type="text" 
+                            danger 
+                            icon={<DeleteOutlined />}
+                            className="review-action-btn review-delete-btn"
+                          >
+                            Eliminar
+                          </Button>
+                        </Popconfirm>
+                      </div>
+                    ]
+                  : undefined
+              }
+            >
               {isEditing ? (
-                <div>
+                <div className="review-form-container">
                   <ReviewForm
                     initialRating={review.rating}
                     initialComment={review.comment}
@@ -100,73 +141,41 @@ const ReviewList: React.FC<ReviewListProps> = ({
                 </div>
               ) : (
                 <>
-                  <div className="modern-review-user">
-                    <Avatar
-                      className="modern-review-avatar"
-                      size={48}
-                      src={review.userProfileImage}
-                      icon={!review.userProfileImage ? <UserOutlined /> : undefined}
-                    />
-                    
-                    <div>
-                      <Text className="modern-review-username">{review.username}</Text>
-                      <div>
-                        <Rate 
-                          className="modern-review-rating" 
-                          disabled 
-                          value={review.rating} 
-                          allowHalf
-                        />
-                        <Text className="modern-review-date">
-                          {moment(review.createdAt).format('LL')}
-                          {review.createdAt !== review.updatedAt && ' (editado)'}
-                        </Text>
+                  <List.Item.Meta
+                    title={
+                      <div className="review-list-item-meta-title">
+                        <Text strong className="review-username">{review.username}</Text>
+                        <Rate disabled value={review.rating} className="review-rating" />
                       </div>
-                      
-                      {showBookInfo && (
-                        <Text type="secondary">
-                          Libro: <a href={`/books/${review.bookId}`}>{review.bookId}</a>
-                        </Text>
-                      )}
-                    </div>
-                  </div>
-                  
+                    }
+                    description={
+                      <Space direction="vertical" size={0}>
+                        <div className="review-date">
+                          {moment(review.createdAt).format('LL')}
+                          {review.updatedAt && review.createdAt.getTime() !== review.updatedAt.getTime() && 
+                            <span className="review-edited">(editado)</span>
+                          }
+                        </div>
+                        {showBookInfo && (
+                          <div className="review-book-info">
+                            Libro: <a href={`/books/${review.bookId}`} className="review-book-link">
+                              {review.username || review.bookId}
+                            </a>
+                          </div>
+                        )}
+                      </Space>
+                    }
+                  />
                   <Paragraph
-                    className="modern-review-content"
+                    className="review-comment"
                     ellipsis={{ rows: 3, expandable: true, symbol: 'más' }}
                   >
                     {review.comment}
                   </Paragraph>
-                  
-                  {isCurrentUserReview && (
-                    <div className="modern-review-actions">
-                      <Button
-                        className="modern-action-button modern-edit-button"
-                        icon={<EditOutlined />}
-                        onClick={() => handleEditClick(review.id)}
-                      >
-                        Editar
-                      </Button>
-                      
-                      <Popconfirm
-                        title="¿Estás seguro que deseas eliminar esta reseña?"
-                        onConfirm={() => onDeleteReview && onDeleteReview(review.id)}
-                        okText="Sí"
-                        cancelText="No"
-                      >
-                        <Button 
-                          className="modern-action-button modern-delete-button" 
-                          icon={<DeleteOutlined />}
-                        >
-                          Eliminar
-                        </Button>
-                      </Popconfirm>
-                    </div>
-                  )}
                 </>
               )}
-              <Divider className="modern-review-divider" />
-            </div>
+              <Divider className="review-divider" />
+            </List.Item>
           );
         }}
       />
