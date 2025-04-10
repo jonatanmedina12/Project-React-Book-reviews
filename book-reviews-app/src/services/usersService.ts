@@ -1,4 +1,4 @@
-import api from './api';
+import api, { getImageUrl } from './api';
 
 /**
  * Interface para el perfil de usuario
@@ -56,7 +56,45 @@ export const getUserProfile = async (): Promise<UserProfile> => {
  */
 export const updateUserProfile = async (profileData: UpdateProfileRequest): Promise<void> => {
   try {
-    await api.put('/user/profile', profileData);
+    // Si hay una imagen en base64, debemos extraerla del objeto antes de enviar
+    const isBase64Image = profileData.profilePictureUrl && 
+                          profileData.profilePictureUrl.startsWith('data:image');
+    
+    let profileToSend = { ...profileData };
+    
+    // Si hay una imagen en base64, la eliminamos del objeto a enviar
+    if (isBase64Image) {
+      // La imagen base64 se enviará por separado
+      delete profileToSend.profilePictureUrl;
+    }
+    
+    // Enviamos la actualización del perfil sin la imagen
+    await api.put('/user/profile', profileToSend);
+    
+    // Si hay una imagen base64, la procesamos después de actualizar el perfil
+    if (isBase64Image && profileData.profilePictureUrl) {
+      // Convertimos la imagen base64 a un archivo
+      const base64Data = profileData.profilePictureUrl.split(',')[1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'image/png' });
+      const file = new File([blob], 'profile-image.png', { type: 'image/png' });
+      
+      // Subimos la imagen de perfil
+      const imageUrl = await uploadProfileImage(file);
+      
+      // Actualizamos el perfil con la URL de la imagen
+      await api.put('/user/profile', {
+        ...profileToSend,
+        profilePictureUrl: imageUrl
+      });
+    }
     
     // Actualizar el usuario en localStorage si existe
     const currentUser = localStorage.getItem('currentUser');
@@ -119,4 +157,25 @@ export const uploadProfileImage = async (file: File): Promise<string> => {
     console.error('Error al subir imagen de perfil:', error);
     throw error;
   }
+};
+
+/**
+ * Convierte una imagen base64 en un File para subir
+ * @param base64Image - Imagen en formato base64
+ * @param fileName - Nombre del archivo a generar
+ * @returns Objeto File listo para subir
+ */
+export const base64ToFile = (base64Image: string, fileName: string): File => {
+  // Separar la parte de datos del formato base64
+  const base64Data = base64Image.split(',')[1];
+  const byteCharacters = atob(base64Data);
+  const byteNumbers = new Array(byteCharacters.length);
+  
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: 'image/png' });
+  return new File([blob], fileName, { type: 'image/png' });
 };

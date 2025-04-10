@@ -102,10 +102,18 @@
   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
 }
 
+/* Estilos específicos para el textarea de resumen */
 .book-form-textarea {
-  resize: vertical;
-  min-height: 120px;
+  resize: vertical; /* Mantener la capacidad de redimensionar */
+  min-height: 30px !important;
+  max-height: 10px!important; /* Altura máxima para limitar expansión */
   border-radius: var(--border-radius);
+}
+
+/* Esta regla afecta al elemento interno de ant-design */
+:global(.ant-input[id$="-summary"]) {
+  max-height: 250px !important; /* Force override */
+  min-height: 120px !important;
 }
 
 /* Botones de acción */

@@ -141,7 +141,14 @@ const BookManager: React.FC = () => {
       
       if (isEditing && currentBook.id) {
         // Actualizar libro existente
-        await updateBook(currentBook.id.toString(), bookData);
+        // Incluir el ID original en los datos a actualizar
+        const dataToUpdate = {
+          ...bookData,
+          id: currentBook.id
+        };
+        
+        // Enviar todos los datos, incluyendo la imagen en base64 si existe
+        await updateBook(currentBook.id.toString(), dataToUpdate);
         message.success('Libro actualizado con éxito.');
       } else {
         // Crear nuevo libro
@@ -363,7 +370,6 @@ const BookManager: React.FC = () => {
           initialValues={currentBook}
           onSubmit={handleSubmit}
           loading={submitLoading}
-          bookId={currentBook.id?.toString()}
           isUpdate={isEditing}
         />
       </Drawer>

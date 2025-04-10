@@ -1,0 +1,61 @@
+/* 
+ * Estilos para el componente ProfileEditTab
+ * Utiliza un diseño moderno y responsivo
+ */
+
+ .profile-edit-tab-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 0;
+  }
+  
+  .profile-edit-card {
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  .section-title {
+    margin-bottom: 8px !important;
+    font-weight: 600 !important;
+  }
+  
+  .section-description {
+    display: block;
+    margin-bottom: 16px;
+    color: rgba(0, 0, 0, 0.45);
+  }
+  
+  .profile-edit-tabs {
+    margin-top: 8px;
+  }
+  
+  .tab-content {
+    padding: 16px 0;
+  }
+  
+  /* Estilos para los íconos de las pestañas */
+  .ant-tabs-tab .anticon {
+    margin-right: 8px;
+  }
+  
+  /* Estilos para las pestañas activas */
+  .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    font-weight: 500;
+  }
+  
+  /* Estilos para dispositivos móviles */
+  @media (max-width: 576px) {
+    .profile-edit-tab-container {
+      padding: 16px;
+    }
+    
+    .profile-edit-card {
+      border-radius: 4px;
+    }
+    
+    .tab-content {
+      padding: 12px 0;
+    }
+  }

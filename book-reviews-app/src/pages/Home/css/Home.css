@@ -1,0 +1,105 @@
+/* Home.css - Estilos para la página principal de libros */
+
+:root {
+    --primary-color: #1890ff;
+    --primary-color-hover: #40a9ff;
+    --secondary-color: #13c2c2;
+    --border-radius: 8px;
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
+    --transition-normal: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  }
+  
+  /* Estilo del contenedor principal */
+  .home-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  
+  /* Título de la página */
+  .home-title {
+    margin-bottom: 24px;
+    color: var(--text-color, rgba(0, 0, 0, 0.85));
+    transition: var(--transition-normal);
+  }
+  
+  /* Contenedor de filtros */
+  .book-filters-container {
+    margin-bottom: 24px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    padding: 16px;
+    background-color: #fff;
+    transition: var(--transition-normal);
+  }
+  
+  .book-filters-container:hover {
+    box-shadow: var(--shadow-md);
+  }
+  
+  /* Estilos de carga */
+  .book-loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+  }
+  
+  /* Estilos de paginación */
+  .book-pagination {
+    text-align: center;
+    margin-top: 24px;
+    padding: 16px;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 992px) {
+    .home-container {
+      padding: 16px;
+    }
+  
+    .home-title {
+      font-size: 24px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .book-filters-container {
+      padding: 12px;
+    }
+  
+    .home-title {
+      font-size: 22px;
+      text-align: center;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .home-container {
+      padding: 12px;
+    }
+  
+    .home-title {
+      font-size: 20px;
+    }
+  }
+  
+  /* Dark mode adjustments */
+  .dark-mode .home-container {
+    background-color: #141414;
+  }
+  
+  .dark-mode .home-title {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  
+  .dark-mode .book-filters-container {
+    background-color: #1f1f1f;
+    box-shadow: 0 2px 6px rgba(255, 255, 255, 0.08);
+  }
+  
+  .dark-mode .book-filters-container:hover {
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.12);
+  }

@@ -14,7 +14,6 @@ interface BookFormProps {
   initialValues?: Partial<Book>;
   onSubmit: (bookData: Partial<Book>) => Promise<void>;
   loading?: boolean;
-  bookId?: string;
   isUpdate?: boolean;
 }
 
@@ -26,13 +25,13 @@ const BookForm: React.FC<BookFormProps> = ({
   initialValues,
   onSubmit,
   loading = false,
-  bookId,
   isUpdate = false,
 }) => {
   const [form] = Form.useForm();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState<boolean>(false);
   const [coverImageUrl, setCoverImageUrl] = useState<string>('');
+  const [summaryValue, setSummaryValue] = useState<string>('');
 
   // Cargar categorías al montar el componente
   useEffect(() => {
@@ -44,6 +43,7 @@ const BookForm: React.FC<BookFormProps> = ({
     if (initialValues) {
       form.setFieldsValue(initialValues);
       setCoverImageUrl(initialValues.coverImageUrl || '');
+      setSummaryValue(initialValues.summary || '');
     }
   }, [initialValues, form]);
 
@@ -64,6 +64,17 @@ const BookForm: React.FC<BookFormProps> = ({
   };
 
   /**
+   * Maneja el cambio en el campo de resumen
+   * @param e Evento de cambio
+   */
+  const handleSummaryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setSummaryValue(value);
+    // Actualiza el valor en el formulario para mantenerlos sincronizados
+    form.setFieldsValue({ summary: value });
+  };
+
+  /**
    * Maneja el envío del formulario
    * @param values Valores del formulario
    */
@@ -72,6 +83,7 @@ const BookForm: React.FC<BookFormProps> = ({
     const bookData = {
       ...values,
       coverImageUrl,
+      summary: summaryValue, // Asegura que se usa el valor controlado
     };
     
     try {
@@ -79,6 +91,7 @@ const BookForm: React.FC<BookFormProps> = ({
       if (!isUpdate) {
         form.resetFields();
         setCoverImageUrl('');
+        setSummaryValue('');
       }
     } catch (error) {
       console.error('Error al enviar el formulario:', error);
@@ -103,7 +116,6 @@ const BookForm: React.FC<BookFormProps> = ({
                 <BookImageUpload
                   value={coverImageUrl}
                   onChange={url => setCoverImageUrl(url)}
-                  bookId={bookId}
                   disabled={loading}
                 />
               </div>
@@ -262,7 +274,7 @@ const BookForm: React.FC<BookFormProps> = ({
               </Form.Item>
             </Col>
             
-            {/* Resumen */}
+            {/* Resumen - Control manual */}
             <Col xs={24}>
               <Form.Item
                 name="summary"
@@ -273,8 +285,10 @@ const BookForm: React.FC<BookFormProps> = ({
                 <TextArea 
                   placeholder="Resumen del libro" 
                   rows={4} 
-                  maxLength={1000} 
-                  showCount 
+                  maxLength={1000}
+                  showCount
+                  value={summaryValue}
+                  onChange={handleSummaryChange}
                   className="book-form-textarea"
                 />
               </Form.Item>
