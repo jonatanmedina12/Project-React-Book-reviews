@@ -19,10 +19,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          cache: 'npm'
+          # Desactivamos la caché ya que no tenemos archivo de bloqueo
+          # cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run tests
         run: npm test -- --passWithNoTests
