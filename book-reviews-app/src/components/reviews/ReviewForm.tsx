@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Rate, Input, Button, Typography } from 'antd';
 import { useAuth } from '../../context/AuthContext';
 import './css/ReviewForm.css';
@@ -13,6 +13,7 @@ interface ReviewFormProps {
   onSubmit: (rating: number, comment: string) => Promise<void>;
   onCancel?: () => void;
   isUpdate?: boolean;
+  loading?: boolean;
 }
 
 /**
@@ -26,11 +27,24 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
   onSubmit,
   onCancel,
   isUpdate = false,
+  loading: externalLoading = false,
 }) => {
   const { isAuthenticated } = useAuth();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [currentRating, setCurrentRating] = useState(initialRating);
+  // Asegurarnos de que el rating inicial sea un entero entre 1 y 5
+  const defaultRating = Math.round(Math.max(1, Math.min(5, initialRating || 3)));
+  const [currentRating, setCurrentRating] = useState(defaultRating);
+
+  // Establecer los valores iniciales cuando cambian las props, asegurando que sean enteros
+  useEffect(() => {
+    const validRating = Math.round(Math.max(1, Math.min(5, initialRating || 3)));
+    form.setFieldsValue({
+      rating: validRating,
+      comment: initialComment || ''
+    });
+    setCurrentRating(validRating);
+  }, [initialRating, initialComment, form]);
 
   // Si el usuario no está autenticado, mostrar mensaje para iniciar sesión
   if (!isAuthenticated) {
@@ -53,10 +67,16 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
   const handleSubmit = async (values: { rating: number; comment: string }) => {
     try {
       setLoading(true);
-      await onSubmit(values.rating, values.comment);
+      // Verificar que rating sea un valor entero entre 1 y 5
+      const validRating = Math.round(Math.max(1, Math.min(5, values.rating || 3)));
+      
+      console.log('Enviando reseña con rating:', validRating, 'y comentario:', values.comment);
+      
+      // Pasamos rating y comment directamente
+      await onSubmit(validRating, values.comment);
       if (!isUpdate) {
         form.resetFields();
-        setCurrentRating(0);
+        setCurrentRating(3); // Restablecer a 3 estrellas
       }
     } catch (error) {
       console.error('Error al enviar la reseña:', error);
@@ -70,20 +90,26 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
    * @param value Nueva calificación
    */
   const handleRatingChange = (value: number) => {
-    setCurrentRating(value);
+    // Asegurarse de que no sea undefined, null o 0 y que sea un entero
+    const validValue = Math.round(Math.max(1, Math.min(5, value || 3)));
+    setCurrentRating(validValue);
+    form.setFieldsValue({ rating: validValue });
   };
 
   // Obtener el texto correspondiente a la calificación actual
   const getRatingText = (rating: number) => {
     const texts = ['Sin calificar', 'Muy malo', 'Malo', 'Regular', 'Bueno', 'Excelente'];
-    return texts[Math.floor(rating)];
+    return texts[Math.min(5, Math.max(0, Math.round(rating)))];
   };
 
   return (
     <Form
       form={form}
       layout="vertical"
-      initialValues={{ rating: initialRating, comment: initialComment }}
+      initialValues={{ 
+        rating: defaultRating,
+        comment: initialComment || '' 
+      }}
       onFinish={handleSubmit}
       className="review-form"
     >
@@ -99,13 +125,12 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
       >
         <div className="review-rating-container">
           <Rate 
-            allowHalf 
+            allowHalf={false} // Deshabilitar valores de media estrella
             className="review-rating" 
             onChange={handleRatingChange}
+            value={currentRating}
           />
-          {currentRating > 0 && (
-            <span className="review-rating-text">{getRatingText(currentRating)}</span>
-          )}
+          <span className="review-rating-text">{getRatingText(currentRating)}</span>
         </div>
       </Form.Item>
       
@@ -119,6 +144,8 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
           rows={4} 
           placeholder="Comparte tu opinión sobre este libro..." 
           className="review-form-textarea"
+          maxLength={1000}
+          showCount
         />
       </Form.Item>
       
@@ -127,7 +154,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
           <Button 
             type="primary" 
             htmlType="submit" 
-            loading={loading}
+            loading={loading || externalLoading}
             className="review-submit-button"
           >
             {isUpdate ? 'Actualizar Reseña' : 'Enviar Reseña'}

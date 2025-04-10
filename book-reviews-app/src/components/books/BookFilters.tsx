@@ -92,15 +92,7 @@ const BookFilters: React.FC<BookFiltersProps> = ({
       }}
     >
       <Row gutter={16}>
-        <Col xs={24} sm={12} md={8} lg={8}>
-          <Form.Item name="search" label="Buscar por título o autor">
-            <Input
-              placeholder="Buscar libros..."
-              allowClear
-              prefix={<SearchOutlined />}
-            />
-          </Form.Item>
-        </Col>
+    
         
         <Col xs={24} sm={12} md={8} lg={8}>
           <Form.Item name="category" label="Categoría">

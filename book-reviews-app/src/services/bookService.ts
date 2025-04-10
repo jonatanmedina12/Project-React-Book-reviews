@@ -104,33 +104,14 @@ export const getBookById = async (id: string): Promise<BookDetails> => {
 
 /**
  * Crea un nuevo libro en el sistema (solo para administradores)
- * @param bookData - Datos del libro a crear
+ * @param bookData - Datos del libro a crear, incluyendo la imagen en base64 si existe
  * @returns Promesa con la información del libro creado
  */
 export const createBook = async (bookData: Partial<Book>): Promise<Book> => {
   try {
+    // Enviamos todos los datos, incluyendo la imagen en base64 si existe
     const response = await api.post('/book', bookData);
-    const createdBook = response.data;
-    
-    // Si tiene una imagen temporal base64, subirla como archivo después de la creación
-    if (bookData.coverImageUrl && bookData.coverImageUrl.startsWith('data:') && createdBook.id) {
-      // Convertir la imagen base64 a un archivo para subir
-      const base64Data = bookData.coverImageUrl.split(',')[1];
-      const byteCharacters = atob(base64Data);
-      const byteNumbers = new Array(byteCharacters.length);
-      
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      
-
-      
-      // Recargar el libro para obtener la URL de la imagen
-      const updatedBook = await getBookById(createdBook.id.toString());
-      return updatedBook;
-    }
-    
-    return createdBook;
+    return response.data;
   } catch (error) {
     console.error('Error al crear libro:', error);
     throw error;
@@ -140,43 +121,13 @@ export const createBook = async (bookData: Partial<Book>): Promise<Book> => {
 /**
  * Actualiza la información de un libro existente (solo para administradores)
  * @param id - ID del libro a actualizar
- * @param bookData - Datos actualizados del libro
+ * @param bookData - Datos actualizados del libro, incluyendo la imagen en base64 si existe
  * @returns Promesa con el resultado de la operación
  */
 export const updateBook = async (id: string, bookData: Partial<Book>): Promise<void> => {
   try {
-    // Clonar los datos para no modificar el objeto original
-    const bookDataToSend = { ...bookData };
-    
-    // Si hay una imagen base64, manejarla por separado
-    const hasBase64Image = bookData.coverImageUrl && bookData.coverImageUrl.startsWith('data:');
-    
-    // Eliminar la imagen base64 del objeto a enviar al backend
-    if (hasBase64Image) {
-      delete bookDataToSend.coverImageUrl;
-    }
-    
-    // Actualizar los datos del libro
-    await api.put(`/book/${id}`, bookDataToSend);
-    
-    // Si hay una imagen base64, subirla por separado
-    if (hasBase64Image && bookData.coverImageUrl) {
-      // Convertir la imagen base64 a un archivo para subir
-      const base64Data = bookData.coverImageUrl.split(',')[1];
-      const byteCharacters = atob(base64Data);
-      const byteNumbers = new Array(byteCharacters.length);
-      
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'image/png' });
-      const file = new File([blob], 'cover-image.png', { type: 'image/png' });
-      
-      // Subir el archivo de imagen
-      await uploadCoverImage(id, file);
-    }
+    // Enviamos todos los datos, incluyendo la imagen en base64 si existe
+    await api.put(`/book/${id}`, bookData);
   } catch (error) {
     console.error(`Error al actualizar libro con ID ${id}:`, error);
     throw error;
@@ -193,31 +144,6 @@ export const deleteBook = async (id: string): Promise<void> => {
     await api.delete(`/book/${id}`);
   } catch (error) {
     console.error(`Error al eliminar libro con ID ${id}:`, error);
-    throw error;
-  }
-};
-
-/**
- * Sube una imagen de portada para un libro
- * @param id - ID del libro
- * @param file - Archivo de imagen a subir
- * @returns Promesa con la URL de la imagen subida
- */
-export const uploadCoverImage = async (id: string, file: File): Promise<string> => {
-  try {
-    const formData = new FormData();
-    formData.append('coverImage', file);
-    
-    const response = await api.post(`/book/${id}/cover-image`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    
-    // Retornar la URL procesada para que sea accesible directamente
-    return response.data.coverImageUrl || response.data.imageUrl || '';
-  } catch (error) {
-    console.error(`Error al subir imagen de portada para libro con ID ${id}:`, error);
     throw error;
   }
 };

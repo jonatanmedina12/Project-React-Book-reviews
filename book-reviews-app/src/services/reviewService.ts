@@ -2,14 +2,6 @@ import api from './api';
 import { Review } from '../types/Review';
 
 /**
- * Interface para crear o actualizar una reseña
- */
-export interface NewReview {
-  rating: number;
-  comment: string;
-}
-
-/**
  * Obtiene todas las reseñas de un libro específico
  * @param bookId - ID del libro para obtener sus reseñas
  * @returns Promesa con la lista de reseñas del libro
@@ -54,17 +46,45 @@ export const getReviewById = async (reviewId: string): Promise<Review> => {
 /**
  * Crea una nueva reseña para un libro
  * @param bookId - ID del libro
- * @param review - Datos de la reseña a crear
+ * @param rating - Calificación de la reseña (debe estar entre 1 y 5)
+ * @param comment - Comentario de la reseña
  * @returns Promesa con la información de la reseña creada
  */
-export const createReview = async (bookId: string, review: NewReview): Promise<Review> => {
+export const createReview = async (bookId: string, rating: number, comment: string): Promise<Review> => {
   try {
+    // Validar que el rating esté entre 1 y 5 y asegurarse de que sea un entero
+    const validRating = Math.round(Math.max(1, Math.min(5, rating)));
+    
+    // Obtener el usuario actual del localStorage
+    const userStr = localStorage.getItem('currentUser');
+    let username = "";
+    
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        username = user.username || "";
+      } catch (parseError) {
+        console.error('Error al parsear datos de usuario:', parseError);
+      }
+    }
+    
+    // Formato completo esperado por el API
     const reviewData = {
-      ...review,
-      bookId: parseInt(bookId)
+      id: 0, // El API ignorará este valor y asignará un ID automáticamente
+      bookId: parseInt(bookId),
+      userId: 0, // El API obtendrá este valor del token
+      username: username, // Usar el nombre de usuario del localStorage
+      rating: validRating, // Asegurar que el rating sea un entero válido
+      comment,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     
+    console.log('Datos de reseña a enviar:', reviewData);
+    
     const response = await api.post(`/Review`, reviewData);
+    
+    console.log('Respuesta del servidor:', response.data);
     
     // Convertir las fechas de string a Date
     return {
@@ -81,65 +101,75 @@ export const createReview = async (bookId: string, review: NewReview): Promise<R
 /**
  * Actualiza una reseña existente
  * @param reviewId - ID de la reseña a actualizar
- * @param review - Nuevos datos de la reseña
- * @param bookId - ID del libro (opcional, se usará si el endpoint no devuelve la reseña completa)
+ * @param rating - Nueva calificación (debe estar entre 1 y 5)
+ * @param comment - Nuevo comentario
+ * @param bookId - ID del libro asociado a la reseña
  * @returns Promesa con la información de la reseña actualizada
  */
-export const updateReview = async (reviewId: string, review: NewReview, bookId?: string): Promise<Review> => {
+export const updateReview = async (
+  reviewId: string, 
+  rating: number, 
+  comment: string, 
+  bookId?: string
+): Promise<Review> => {
   try {
-    // Si no tenemos el bookId, intentar obtener primero la reseña actual
-    let currentBookId: number | undefined;
+    // Validar que el rating esté entre 1 y 5 y asegurarse de que sea un entero
+    const validRating = Math.round(Math.max(1, Math.min(5, rating)));
     
-    if (!bookId) {
-      try {
-        const currentReview = await getReviewById(reviewId);
-        currentBookId = currentReview.bookId;
-      } catch (error) {
-        console.warn(`No se pudo obtener la reseña actual con ID ${reviewId}:`, error);
-        // Continuamos sin el bookId, pero podríamos fallar más tarde
-      }
-    } else {
-      currentBookId = parseInt(bookId);
+    let currentReview: Partial<Review> = {};
+    
+    // Obtener la información actual de la reseña para incluir los campos requeridos
+    try {
+      currentReview = await getReviewById(reviewId);
+    } catch (error) {
+      console.warn(`No se pudo obtener la reseña actual con ID ${reviewId}:`, error);
     }
     
-    // Crear un objeto que incluya el ID de la reseña
+    // Obtener el usuario actual del localStorage
+    const userStr = localStorage.getItem('currentUser');
+    let username = currentReview.username || "";
+    
+    if (userStr && !username) {
+      try {
+        const user = JSON.parse(userStr);
+        username = user.username || "";
+      } catch (parseError) {
+        console.error('Error al parsear datos de usuario:', parseError);
+      }
+    }
+    
+    // Formato completo esperado por el API
     const reviewData = {
-      ...review,
       id: parseInt(reviewId),
-      bookId: currentBookId
+      bookId: currentReview.bookId || (bookId ? parseInt(bookId) : 0),
+      userId: currentReview.userId || 0, // El API verificará este valor con el token
+      username: username,
+      rating: validRating, // Asegurar que el rating sea un entero válido
+      comment,
+      createdAt: currentReview.createdAt?.toISOString() || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     
-    const response = await api.put(`/review/${reviewId}`, reviewData);
+    console.log('Datos de actualización a enviar:', reviewData);
     
-    // Si el servidor no devuelve la reseña actualizada, crear un objeto con la información disponible
-    if (!response.data || Object.keys(response.data).length === 0) {
-      // El endpoint devuelve 204 No Content
-      
-      // Si tenemos el bookId en reviewData, usarlo. De lo contrario, intentar obtener la reseña
-      if (reviewData.bookId) {
-        return {
-          ...reviewData,
-          bookId: reviewData.bookId,
-          userId: -1, // Valor temporal
-          username: '', // Valor temporal
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
-      }
-      
-      // Si no tenemos bookId y el servidor no devolvió datos, intentar obtener la reseña actualizada
-      try {
-        return await getReviewById(reviewId);
-      } catch (secondError) {
-        throw new Error('No se pudo actualizar la reseña: falta el ID del libro y no se pudo obtener la reseña actualizada');
-      }
+    const response = await api.put(`/Review/${reviewId}`, reviewData);
+    
+    console.log('Respuesta de actualización:', response.data);
+    
+    // Si el endpoint devuelve la reseña actualizada
+    if (response.data && Object.keys(response.data).length > 0) {
+      return {
+        ...response.data,
+        createdAt: new Date(response.data.createdAt),
+        updatedAt: response.data.updatedAt ? new Date(response.data.updatedAt) : undefined
+      };
     }
     
-    // Convertir las fechas de string a Date
+    // Si el servidor no devuelve datos (204 No Content), devolver la información que tenemos
     return {
-      ...response.data,
-      createdAt: new Date(response.data.createdAt),
-      updatedAt: response.data.updatedAt ? new Date(response.data.updatedAt) : undefined
+      ...reviewData,
+      createdAt: new Date(reviewData.createdAt),
+      updatedAt: new Date(reviewData.updatedAt)
     };
   } catch (error) {
     console.error(`Error al actualizar reseña con ID ${reviewId}:`, error);
@@ -154,7 +184,7 @@ export const updateReview = async (reviewId: string, review: NewReview, bookId?:
  */
 export const deleteReview = async (reviewId: string): Promise<void> => {
   try {
-    await api.delete(`/review/${reviewId}`);
+    await api.delete(`/Review/${reviewId}`);
   } catch (error) {
     console.error(`Error al eliminar reseña con ID ${reviewId}:`, error);
     throw error;
@@ -167,7 +197,7 @@ export const deleteReview = async (reviewId: string): Promise<void> => {
  */
 export const getUserReviews = async (): Promise<Review[]> => {
   try {
-    const response = await api.get(`/review/user`);
+    const response = await api.get(`/Review/user`);
     
     // Convertir las fechas de string a Date
     return response.data.map((review: any) => ({

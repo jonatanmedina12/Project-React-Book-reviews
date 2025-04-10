@@ -9,6 +9,7 @@ import BookList from '../../components/books/BookList';
 import BookFilters from '../../components/books/BookFilters';
 import { getBooks } from '../../services/bookService';
 import { Book } from '../../types/Book';
+import './css/Home.css';
 
 const { Title } = Typography;
 

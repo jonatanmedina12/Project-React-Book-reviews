@@ -1,36 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Card, Avatar, Tabs, Button, Spin, Upload, message } from 'antd';
-import { UserOutlined, BookOutlined, EditOutlined, UploadOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { Typography, Card, Avatar, Tabs, Button, Spin, message } from 'antd';
+import { UserOutlined, BookOutlined, EditOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getUserReviews, deleteReview, updateReview } from '../../services/reviewService';
 import { Review } from '../../types/Review';
 import ReviewList from '../../components/reviews/ReviewList';
-import type { UploadProps } from 'antd/es/upload';
-import type { UploadFile } from 'antd/es/upload/interface';
+import ProfileEditTab from './ProfileEditTab';
+import './css/Profile.css';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
+/**
+ * Componente de página de perfil
+ * Sigue el principio de responsabilidad única (SRP) para la gestión del perfil de usuario
+ */
 const Profile: React.FC = () => {
   const { user, isAuthenticated, loading } = useAuth();
   const [userReviews, setUserReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState<boolean>(true);
-  
-  // Para la carga de imagen de perfil
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [uploading, setUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('reviews');
 
+  // Cargar reseñas del usuario al montar el componente
   useEffect(() => {
     if (isAuthenticated) {
       fetchUserReviews();
     }
   }, [isAuthenticated]);
 
+  // Redireccionar si no está autenticado
   if (!isAuthenticated && !loading) {
     return <Navigate to="/login" />;
   }
 
+  /**
+   * Obtiene las reseñas del usuario actual
+   */
   const fetchUserReviews = async () => {
     try {
       setReviewsLoading(true);
@@ -44,12 +50,32 @@ const Profile: React.FC = () => {
     }
   };
 
+  /**
+   * Maneja la actualización de una reseña
+   * @param reviewId ID de la reseña a actualizar
+   * @param rating Nueva calificación
+   * @param comment Nuevo comentario
+   */
   const handleUpdateReview = async (reviewId: string, rating: number, comment: string) => {
     try {
-      const updatedReview = await updateReview(reviewId, { rating, comment });
+      // Buscar la reseña original para obtener el bookId
+      const originalReview = userReviews.find(review => review.id === parseInt(reviewId));
+      
+      if (!originalReview) {
+        throw new Error('No se encontró la reseña a actualizar');
+      }
+      
+      // Llamar al servicio con los parámetros en orden correcto
+      const updatedReview = await updateReview(
+        reviewId,
+        rating,
+        comment,
+        originalReview.bookId.toString()
+      );
+      
       message.success('Reseña actualizada correctamente');
       
-      // Actualizar las reseñas - Convertir reviewId a número para comparación
+      // Actualizar las reseñas en el estado local
       setUserReviews(prevReviews => 
         prevReviews.map(review => 
           review.id === parseInt(reviewId) ? updatedReview : review
@@ -61,6 +87,10 @@ const Profile: React.FC = () => {
     }
   };
 
+  /**
+   * Maneja la eliminación de una reseña
+   * @param reviewId ID de la reseña a eliminar
+   */
   const handleDeleteReview = async (reviewId: string) => {
     try {
       await deleteReview(reviewId);
@@ -76,97 +106,57 @@ const Profile: React.FC = () => {
     }
   };
 
-  // Función para subir la imagen de perfil (simulada)
-  const handleUpload = () => {
-    setUploading(true);
-
-    // Simulación de carga
-    setTimeout(() => {
-      setUploading(false);
-      setFileList([]);
-      message.success('Imagen de perfil actualizada correctamente');
-    }, 2000);
+  /**
+   * Maneja el cambio de pestaña
+   * @param key Clave de la pestaña activa
+   */
+  const handleTabChange = (key: string) => {
+    setActiveTab(key);
   };
 
-  const props: UploadProps = {
-    onRemove: file => {
-      const index = fileList.indexOf(file);
-      const newFileList = fileList.slice();
-      newFileList.splice(index, 1);
-      setFileList(newFileList);
-    },
-    beforeUpload: file => {
-      // Validación de tipo de archivo
-      const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-      if (!isJpgOrPng) {
-        message.error('Solo puedes subir imágenes JPG/PNG');
-        return Upload.LIST_IGNORE;
-      }
-      
-      // Validación de tamaño
-      const isLt2M = file.size / 1024 / 1024 < 2;
-      if (!isLt2M) {
-        message.error('La imagen debe ser menor a 2MB');
-        return Upload.LIST_IGNORE;
-      }
-      
-      setFileList([file]);
-      return false;
-    },
-    fileList,
-  };
-
+  // Mostrar spinner mientras carga
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+      <div className="profile-loading-container">
         <Spin size="large" />
       </div>
     );
   }
 
   return (
-    <div>
-      <Title level={2}>Mi Perfil</Title>
+    <div className="profile-container">
+      <Title level={2} className="profile-title">Mi Perfil</Title>
 
-      <Card style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Card className="profile-card">
+        <div className="profile-avatar-container">
           <Avatar 
+            className="profile-avatar"
             size={100} 
             src={user?.profileImage} 
             icon={!user?.profileImage ? <UserOutlined /> : undefined}
           />
           
-          <Title level={3} style={{ marginTop: 16, marginBottom: 4 }}>
+          <Title level={3} className="profile-username">
             {user?.username}
           </Title>
           
-          <Text type="secondary" style={{ marginBottom: 16 }}>
+          <Text type="secondary" className="profile-email">
             {user?.email}
           </Text>
-          
-          <Upload {...props} maxCount={1}>
-            <Button icon={<UploadOutlined />}>Seleccionar imagen</Button>
-          </Upload>
-          
-          <Button
-            type="primary"
-            onClick={handleUpload}
-            disabled={fileList.length === 0}
-            loading={uploading}
-            style={{ marginTop: 16 }}
-          >
-            {uploading ? 'Subiendo...' : 'Actualizar imagen de perfil'}
-          </Button>
         </div>
       </Card>
 
-      <Tabs defaultActiveKey="reviews">
+      <Tabs 
+        activeKey={activeTab} 
+        onChange={handleTabChange} 
+        className="profile-tabs"
+      >
         <TabPane
           tab={<span><BookOutlined /> Mis Reseñas</span>}
           key="reviews"
         >
           {reviewsLoading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
+            <div className="profile-loading-container">
               <Spin />
             </div>
           ) : userReviews.length > 0 ? (
@@ -177,10 +167,15 @@ const Profile: React.FC = () => {
               showBookInfo
             />
           ) : (
-            <div style={{ textAlign: 'center', padding: '40px 0' }}>
-              <Text type="secondary">Aún no has escrito ninguna reseña.</Text>
-              <br />
-              <Button type="primary" style={{ marginTop: 16 }} href="/">
+            <div className="profile-empty-reviews">
+              <Text type="secondary" className="profile-empty-reviews-text">
+                Aún no has escrito ninguna reseña.
+              </Text>
+              <Button 
+                type="primary" 
+                className="profile-explore-btn" 
+                href="/"
+              >
                 Explorar libros
               </Button>
             </div>
@@ -188,19 +183,17 @@ const Profile: React.FC = () => {
         </TabPane>
         
         <TabPane
-          tab={<span><ClockCircleOutlined /> Actividad Reciente</span>}
-          key="activity"
-        >
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <Text type="secondary">Función en desarrollo.</Text>
-          </div>
-        </TabPane>
-        
-        <TabPane
           tab={<span><EditOutlined /> Editar Perfil</span>}
           key="edit"
         >
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
+          <ProfileEditTab />
+        </TabPane>
+        
+        <TabPane
+          tab={<span><ClockCircleOutlined /> Actividad Reciente</span>}
+          key="activity"
+        >
+          <div className="profile-tab-placeholder">
             <Text type="secondary">Función en desarrollo.</Text>
           </div>
         </TabPane>

@@ -1,0 +1,140 @@
+/* ProfileForm.css - Estilos modernos para el formulario de edición de perfil */
+
+.profile-form-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Sección de imagen de perfil */
+  .profile-image-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .profile-avatar {
+    border: 2px solid #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .profile-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .avatar-uploader {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .upload-button {
+    transition: all 0.3s ease;
+  }
+  
+  .upload-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Campos del formulario */
+  .ant-form-item-label > label {
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.85);
+  }
+  
+  .ant-input {
+    border-radius: 6px;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+  }
+  
+  .ant-input:hover {
+    border-color: #40a9ff;
+  }
+  
+  .ant-input:focus {
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+  
+  /* Botones de acción */
+  .form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+  
+  .submit-button {
+    min-width: 120px;
+    height: 40px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Estilos responsivos */
+  @media (max-width: 576px) {
+    .profile-form-container {
+      padding: 15px;
+      box-shadow: none;
+      border-radius: 0;
+    }
+    
+    .form-buttons {
+      flex-direction: column;
+    }
+    
+    .submit-button {
+      width: 100%;
+      margin-top: 10px;
+    }
+  }
+  
+  /* Estilos para modo oscuro (si aplica) */
+  .dark-mode .profile-form-container {
+    background-color: #1f1f1f;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  .dark-mode .profile-avatar {
+    border-color: #333;
+  }
+  
+  .dark-mode .ant-form-item-label > label {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  
+  .dark-mode .ant-input {
+    background-color: #2d2d2d;
+    border-color: #444;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  
+  .dark-mode .ant-input:hover {
+    border-color: #177ddc;
+  }
+  
+  .dark-mode .ant-input:focus {
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }

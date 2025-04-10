@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Upload, message, Button, Modal, Spin } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { RcFile, UploadChangeParam, UploadFile } from 'antd/lib/upload/interface';
-import { uploadCoverImage } from '../../services/bookService';
 import { getImageUrl } from '../../services/api';
 import './css/BookImageUpload.css';
 
@@ -10,7 +9,6 @@ import './css/BookImageUpload.css';
 interface BookImageUploadProps {
   value?: string;
   onChange?: (url: string) => void;
-  bookId?: string;
   disabled?: boolean;
   className?: string;
 }
@@ -18,11 +16,11 @@ interface BookImageUploadProps {
 /**
  * Componente para cargar y previsualizar imágenes de portada de libros
  * Sigue el principio de responsabilidad única (SRP) para la carga de imágenes
+ * Maneja las imágenes como base64 sin realizar peticiones API separadas
  */
 const BookImageUpload: React.FC<BookImageUploadProps> = ({
   value,
   onChange,
-  bookId,
   disabled = false,
   className = '',
 }) => {
@@ -73,49 +71,34 @@ const BookImageUpload: React.FC<BookImageUploadProps> = ({
   };
 
   /**
-   * Maneja la subida de archivos
+   * Maneja la subida de archivos - Convertir siempre a base64
    * @param options Opciones de subida
    */
   const handleUpload = async (options: any) => {
     const { file, onSuccess, onError } = options;
     
-    // Si no hay un ID de libro, solo guardamos la imagen en base64 para enviarla después
-    if (!bookId) {
-      setLoading(true);
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        try {
-          const base64Image = reader.result as string;
-          onChange?.(base64Image);
-          onSuccess("ok", file);
-        } catch (error) {
-          onError(error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      reader.onerror = () => {
-        setLoading(false);
-        onError();
-      };
-      return;
-    }
+    setLoading(true);
     
-    // Si hay un ID de libro, subimos la imagen al servidor
-    try {
-      setLoading(true);
-      const imageUrl = await uploadCoverImage(bookId, file);
-      onChange?.(imageUrl);
-      onSuccess("ok", file);
-      message.success('Imagen subida correctamente');
-    } catch (error) {
-      console.error('Error al subir imagen:', error);
-      message.error('Error al subir la imagen');
-      onError();
-    } finally {
+    // Siempre convertir a base64 y guardar en memoria
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    
+    reader.onload = () => {
+      try {
+        const base64Image = reader.result as string;
+        onChange?.(base64Image);
+        onSuccess("ok", file);
+        setLoading(false);
+      } catch (error) {
+        onError(error);
+        setLoading(false);
+      }
+    };
+    
+    reader.onerror = () => {
       setLoading(false);
-    }
+      onError();
+    };
   };
 
   /**

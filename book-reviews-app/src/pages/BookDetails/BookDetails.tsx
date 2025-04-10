@@ -112,7 +112,8 @@ const BookDetails: React.FC = () => {
     if (!id) return;
     
     try {
-      const newReview = await createReview(id, { rating, comment });
+      // Pasamos rating y comment directamente en lugar de un objeto
+      const newReview = await createReview(id, rating, comment);
       message.success('Reseña enviada correctamente');
       
       // Actualizar las reseñas y el userReview
@@ -137,8 +138,8 @@ const BookDetails: React.FC = () => {
     if (!id) return;
     
     try {
-      // Pasar el bookId como tercer parámetro a updateReview
-      const updatedReview = await updateReview(reviewId, { rating, comment }, id);
+      // Pasamos los parámetros correctamente: reviewId, rating, comment, bookId
+      const updatedReview = await updateReview(reviewId, rating, comment, id);
       message.success('Reseña actualizada correctamente');
       
       // Actualizar las reseñas y el userReview
@@ -311,7 +312,6 @@ const BookDetails: React.FC = () => {
                   <Title level={4} className="all-reviews-title">Todas las reseñas</Title>
                   <ReviewList
                     reviews={reviews.filter(review => !userReview || review.id !== userReview.id)}
-                    loading={reviewsLoading}
                     onDeleteReview={isAuthenticated ? handleDeleteReview : undefined}
                     onUpdateReview={isAuthenticated ? handleUpdateReview : undefined}
                   />
