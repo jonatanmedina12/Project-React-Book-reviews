@@ -1,5 +1,4 @@
-name: Deploy React App to Railway
-
+name: Deploy to Railway
 on:
   push:
     branches: [ main, master ]
@@ -12,122 +11,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '20.x'
 
       - name: Install dependencies
-        working-directory: ./book-reviews-app
-        run: npm install
+        run: cd book-reviews-app && npm install
 
-      - name: Run tests
-        working-directory: ./book-reviews-app
-        run: npm test -- --passWithNoTests
+      - name: Build
+        run: cd book-reviews-app && npm run build
 
-      - name: Build project
-        working-directory: ./book-reviews-app
-        run: npm run build
+      - name: Test
+        run: cd book-reviews-app && npm test -- --passWithNoTests
 
-      # Copiamos los archivos de configuración necesarios a book-reviews-app
-      - name: Copy deployment files
-        run: |
-          # Copiar Dockerfile al directorio del proyecto
-          cp Dockerfile book-reviews-app/ || echo "Dockerfile no encontrado, creando..."
-          # Si no existe, crear Dockerfile en el directorio del proyecto
-          if [ ! -f "book-reviews-app/Dockerfile" ]; then
-            cat > book-reviews-app/Dockerfile << 'EOF'
-# Imagen base para compilación
-  FROM node:20-alpine AS build
-  
-  # Establecer directorio de trabajo
-  WORKDIR /app
-  
-  # Copiar package.json y package-lock.json
-  COPY package*.json ./
-  
-  # Instalar dependencias
-  RUN npm ci
-  
-  # Copiar el resto de archivos
-  COPY . .
-  
-  # Compilar la aplicación
-  RUN npm run build
-  
-  # Imagen base para producción con Nginx
-  FROM nginx:alpine AS production
-  
-  # Copiar la configuración de Nginx
-  COPY nginx.conf /etc/nginx/conf.d/default.conf
-  
-  # Copiar los archivos compilados desde la etapa de build
-  COPY --from=build /app/build /usr/share/nginx/html
-  
-  # Exponer puerto
-  EXPOSE \$PORT
-  
-  # Script para reemplazar la variable PORT en la configuración de Nginx
-  COPY docker-entrypoint.sh /
-  RUN chmod +x /docker-entrypoint.sh
-  ENTRYPOINT ["/docker-entrypoint.sh"]
-  
-  # Iniciar Nginx
-  CMD ["nginx", "-g", "daemon off;"]
-  EOF
-  fi
-  
-  # Crear nginx.conf
-  cat > book-reviews-app/nginx.conf << 'EOF'
-  server {
-  listen       $PORT;
-  server_name  localhost;
-  
-  location / {
-  root   /usr/share/nginx/html;
-  index  index.html index.htm;
-  try_files $uri $uri/ /index.html;
-}
-
-  error_page   500 502 503 504  /50x.html;
-  location = /50x.html {
-  root   /usr/share/nginx/html;
-}
-}
-  EOF
-  
-  # Crear docker-entrypoint.sh
-  cat > book-reviews-app/docker-entrypoint.sh << 'EOF'
-  #!/bin/sh
-  
-  # Reemplazar $PORT en la configuración de Nginx con la variable de entorno PORT
-  sed -i "s/\$PORT/${PORT:-80}/g" /etc/nginx/conf.d/default.conf
-  
-  # Ejecutar el comando proporcionado
-  exec "$@"
-  EOF
-  
-  # Crear railway.json
-  cat > book-reviews-app/railway.json << 'EOF'
-  {
-    "$schema": "https://railway.app/railway.schema.json",
-    "build": {
-      "builder": "DOCKERFILE",
-      "dockerfilePath": "./Dockerfile"
-    },
-    "deploy": {
-      "restartPolicyType": "ON_FAILURE",
-      "restartPolicyMaxRetries": 10
-    }
-  }
-  EOF
-
-- name: Deploy to Railway
-  working-directory: ./book-reviews-app
-  uses: bervProject/railway-deploy@main
-  with:
-    railway_token: ${{ secrets.RAILWAY_TOKEN }}
-    service: "Project-React-Book-reviews"
+      - name: Deploy to Railway
+        uses: bervProject/railway-deploy@main
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: "Project-React-Book-reviews"
