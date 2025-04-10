@@ -20,14 +20,18 @@ jobs:
 
       # Navegar a la carpeta de la aplicación e instalar dependencias
       - name: Install dependencies
-        run: cd book-reviews-app && npm install && npm install react-router-dom --save
+        run: |
+          cd book-reviews-app
+          npm ci
+          npm install react-router-dom --no-save
+          npm ls react-router-dom
 
       # Ignorar los warnings durante el build estableciendo CI=false
       - name: Build
         run: cd book-reviews-app && CI=false npm run build
 
       - name: Test
-        run: cd book-reviews-app && npm test -- --passWithNoTests
+        run: cd book-reviews-app && NODE_ENV=test npm test -- --passWithNoTests
 
       - name: Deploy to Railway
         uses: bervProject/railway-deploy@main
