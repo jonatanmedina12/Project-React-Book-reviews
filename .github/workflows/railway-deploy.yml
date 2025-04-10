@@ -33,6 +33,7 @@ jobs:
       - name: Deploy to Railway
         uses: bervProject/railway-deploy@main
         with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: "Project-React-Book-reviews"
+          railway_token: "10826330-dd52-46b4-8c09-ddf737924f1b"
+          service: "Project-React-Book-reviews"  # Exactamente como aparece en Railway
+          project_id: "c193a865-1772-4606-941c-0336aec0828c"
           root: "book-reviews-app"

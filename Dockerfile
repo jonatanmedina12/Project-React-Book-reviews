@@ -4,17 +4,14 @@ FROM node:20-alpine AS build
 # Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar package.json y package-lock.json
-COPY package*.json ./
+# Copiar todo el contenido del directorio book-reviews-app
+COPY ./book-reviews-app/ ./
 
 # Instalar react-router-dom explícitamente primero
 RUN npm install react-router-dom --save
 
 # Instalar dependencias
 RUN npm ci
-
-# Copiar el resto de archivos
-COPY . .
 
 # Compilar la aplicación (ignorando errores de linting)
 RUN CI=false npm run build
