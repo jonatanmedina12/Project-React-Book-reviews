@@ -20,7 +20,7 @@ jobs:
 
       # Navegar a la carpeta de la aplicación e instalar dependencias
       - name: Install dependencies
-        run: cd book-reviews-app && npm install
+        run: cd book-reviews-app && npm install && npm install react-router-dom --save
 
       # Ignorar los warnings durante el build estableciendo CI=false
       - name: Build
