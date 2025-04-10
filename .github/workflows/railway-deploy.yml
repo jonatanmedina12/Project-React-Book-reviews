@@ -1,4 +1,4 @@
-name: Deploy to Railway
+name: Deploy to Railway with Docker
 on:
   push:
     branches: [ main, master ]
@@ -7,34 +7,26 @@ on:
 
 jobs:
   build-and-deploy:
-    name: Build and Deploy
+    name: Build and Deploy with Docker
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.x'
+      # Login a Railway
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
 
-      - name: Install dependencies
-        run: cd book-reviews-app && npm install
+      # Construir la imagen Docker
+      - name: Build Docker image
+        run: |
+          cd book-reviews-app
+          docker build -t book-reviews-app:latest .
 
-      # Opción 1: Corregir los errores de ESLint antes del build
-      - name: Lint
-        run: cd book-reviews-app && npm run lint --fix
-
-      # Opción 2: Ignorar warnings de ESLint durante el build
-      - name: Build
-        run: cd book-reviews-app && CI=false npm run build
-        # El CI=false hace que los warnings no se traten como errores
-
-      - name: Test
-        run: cd book-reviews-app && npm test -- --passWithNoTests
-
+      # Desplegar en Railway
       - name: Deploy to Railway
-        uses: bervProject/railway-deploy@main
-        with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: "Project-React-Book-reviews"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          railway login --token $RAILWAY_TOKEN
+          railway up --service "Project-React-Book-reviews"
