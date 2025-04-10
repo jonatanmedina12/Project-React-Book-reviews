@@ -5,7 +5,7 @@ FROM node:20-alpine AS build
 WORKDIR /app
 
 # Copiar package.json y package-lock.json
-COPY package*.json ./
+COPY ./book-reviews-app/package*.json ./
 
 # Instalar react-router-dom explícitamente primero
 RUN npm install react-router-dom --save
