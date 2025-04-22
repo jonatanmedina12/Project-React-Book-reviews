@@ -1,221 +1,246 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Upload, message, Avatar } from 'antd';
-import { UserOutlined, UploadOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Avatar, Upload, message, Spin, Alert } from 'antd';
+import { UserOutlined, MailOutlined, UploadOutlined } from '@ant-design/icons';
+import { getUserProfile, updateUserProfile } from '../../services/usersService';
 import { useAuth } from '../../context/AuthContext';
-import { getUserProfile, updateUserProfile, UpdateProfileRequest } from '../../services/usersService';
-import type { UploadFile } from 'antd/es/upload/interface';
+import type { RcFile } from 'antd/lib/upload/interface';
 import './css/ProfileForm.css';
+
+// Tamaño máximo para la carga de imágenes (5MB)
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 interface ProfileFormProps {
   onSuccess?: () => void;
 }
 
 /**
- * Componente para editar el perfil de usuario
- * Sigue el principio de responsabilidad única (SRP) para la edición de perfil
+ * Componente de formulario para editar información del perfil
  */
 const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess }) => {
-  const { user, isAuthenticated } = useAuth();
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string | undefined>(user?.profileImage);
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const { user } = useAuth();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
+  const [imageLoading, setImageLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Cargar los datos del perfil al montar el componente
+  // Cargar datos del perfil al montar el componente
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchProfileData();
+    if (user) {
+      form.setFieldsValue({
+        username: user.username,
+        email: user.email,
+      });
+      setImageUrl(user.profileImage);
+    } else {
+      fetchUserProfile();
     }
-  }, [isAuthenticated]);
+  }, [form, user]);
 
   /**
    * Obtiene los datos del perfil del usuario
    */
-  const fetchProfileData = async () => {
+  const fetchUserProfile = async () => {
     try {
       setLoading(true);
-      const profile = await getUserProfile();
-      
-      // Establecer los valores iniciales del formulario
+      setError(null);
+      const userProfile = await getUserProfile();
       form.setFieldsValue({
-        username: profile.username,
-        email: profile.email
+        username: userProfile.username,
+        email: userProfile.email,
       });
-      
-      // Establecer la imagen de perfil si existe
-      if (profile.profilePictureUrl) {
-        setPreviewImage(profile.profilePictureUrl);
-      }
+      setImageUrl(userProfile.profileImage);
     } catch (error) {
-      message.error('Error al cargar los datos del perfil');
       console.error('Error al cargar datos del perfil:', error);
+      setError('No se pudieron cargar los datos del perfil');
     } finally {
       setLoading(false);
     }
   };
 
   /**
-   * Maneja el envío del formulario
-   * @param values Valores del formulario
+   * Maneja la carga de la imagen de perfil
+   * @param file - Archivo a cargar
+   * @returns Booleano indicando si debe continuar la carga
    */
-  const handleSubmit = async (values: any) => {
+  const handleImageUpload = (file: RcFile): boolean => {
+    // Verificar el tamaño del archivo
+    if (file.size > MAX_FILE_SIZE) {
+      message.error('La imagen debe ser menor a 5MB');
+      return false;
+    }
+
+    // Verificar el tipo de archivo (solo imágenes)
+    const isImage = file.type.startsWith('image/');
+    if (!isImage) {
+      message.error('Solo se permiten archivos de imagen');
+      return false;
+    }
+
+    setImageLoading(true);
+    setError(null);
+
+    // Convertir la imagen a base64 para mostrarla previamente
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      setImageUrl(reader.result as string);
+      setImageLoading(false);
+    };
+
+    // Evitar la carga automática
+    return false;
+  };
+
+  /**
+   * Envía el formulario para actualizar el perfil
+   * @param values - Valores del formulario
+   */
+  const onFinish = async (values: any) => {
     try {
       setLoading(true);
+      setError(null);
       
-      // Preparar los datos para actualizar
-      const profileData: UpdateProfileRequest = {
+      await updateUserProfile({
         username: values.username,
-        email: values.email
-      };
-      
-      // Si hay una imagen base64, incluirla en los datos
-      if (previewImage && (previewImage !== user?.profileImage)) {
-        profileData.profilePictureUrl = previewImage;
-      }
-      
-      // Actualizar el perfil
-      await updateUserProfile(profileData);
+        email: values.email,
+        profileImage: imageUrl
+      });
       
       message.success('Perfil actualizado correctamente');
       
-      // Llamar al callback de éxito si existe
+      // Esperar un momento antes de recargar para que se muestre el mensaje
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+      
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error) {
-      message.error('Error al actualizar el perfil');
+    } catch (error: any) {
       console.error('Error al actualizar perfil:', error);
+      
+      // Extraer y mostrar el mensaje de error
+      let errorMessage = 'Error al actualizar el perfil';
+      
+      if (error.response) {
+        // Si es un error de respuesta del servidor
+        if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        } else if (error.response.data && error.response.data.errors) {
+          // Si es un objeto de errores de validación
+          const errorKeys = Object.keys(error.response.data.errors);
+          if (errorKeys.length > 0) {
+            const firstErrorKey = errorKeys[0];
+            errorMessage = error.response.data.errors[firstErrorKey][0];
+          }
+        } else if (error.response.data && error.response.data.title) {
+          // Si es un objeto ProblemDetails de ASP.NET Core
+          errorMessage = `${error.response.data.title}: ${error.response.data.detail || ''}`;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
-
-  /**
-   * Convierte un archivo a base64 para previsualización
-   * @param file Archivo a convertir
-   * @returns Promesa con la representación base64 del archivo
-   */
-  const getBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
-    });
-  };
-
-  /**
-   * Maneja el cambio en el componente de carga de imagen
-   * @param info Información del cambio
-   */
-  const handleImageChange = async (info: any) => {
-    const file = info.file.originFileObj;
-    if (file) {
-      try {
-        const base64 = await getBase64(file);
-        setPreviewImage(base64);
-        setFileList([info.file]);
-      } catch (error) {
-        console.error('Error al convertir imagen a base64:', error);
-      }
-    }
-  };
-
-  /**
-   * Valida el tipo y tamaño de la imagen antes de subirla
-   * @param file Archivo a validar
-   * @returns true si es válido, false si no lo es
-   */
-  const beforeUpload = (file: File) => {
-    // Validar el tipo de archivo
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-    if (!isJpgOrPng) {
-      message.error('Solo puedes subir imágenes JPG/PNG');
-      return Upload.LIST_IGNORE;
-    }
-    
-    // Validar el tamaño del archivo (2MB máximo)
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('La imagen debe ser menor a 2MB');
-      return Upload.LIST_IGNORE;
-    }
-    
-    return false; // Evitar la carga automática
   };
 
   return (
     <div className="profile-form-container">
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        className="profile-form"
-      >
-        {/* Sección de imagen de perfil */}
-        <div className="profile-image-section">
-          <Avatar
-            size={100}
-            src={previewImage}
-            icon={!previewImage ? <UserOutlined /> : undefined}
-            className="profile-avatar"
-          />
-          
-          <Upload
-            name="avatar"
-            listType="picture"
-            className="avatar-uploader"
-            showUploadList={false}
-            beforeUpload={beforeUpload}
-            onChange={handleImageChange}
-            fileList={fileList}
-            maxCount={1}
-          >
-            <Button 
-              icon={<UploadOutlined />} 
-              className="upload-button"
-            >
-              Cambiar imagen
-            </Button>
-          </Upload>
+      {error && (
+        <Alert 
+          message="Error" 
+          description={error} 
+          type="error" 
+          showIcon 
+          className="profile-form-error"
+          closable
+          onClose={() => setError(null)}
+        />
+      )}
+      
+      {loading && !error ? (
+        <div className="profile-form-loading">
+          <Spin size="large" />
         </div>
-        
-        {/* Campos del formulario */}
-        <Form.Item
-          name="username"
-          label="Nombre de usuario"
-          rules={[
-            { required: true, message: 'Por favor ingresa tu nombre de usuario' },
-            { min: 3, message: 'El nombre debe tener al menos 3 caracteres' },
-            { max: 50, message: 'El nombre no puede exceder los 50 caracteres' }
-          ]}
-        >
-          <Input placeholder="Nombre de usuario" />
-        </Form.Item>
-        
-        <Form.Item
-          name="email"
-          label="Correo electrónico"
-          rules={[
-            { required: true, message: 'Por favor ingresa tu correo electrónico' },
-            { type: 'email', message: 'Ingresa un correo electrónico válido' }
-          ]}
-        >
-          <Input placeholder="Correo electrónico" />
-        </Form.Item>
-        
-        {/* Botones de acción */}
-        <Form.Item className="form-buttons">
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-            className="submit-button"
+      ) : (
+        <>
+          <div className="profile-form-avatar-section">
+            <div className="profile-form-avatar-container">
+              {imageLoading ? (
+                <Spin className="profile-form-avatar-loading" />
+              ) : (
+                <Avatar
+                  size={100}
+                  src={imageUrl}
+                  icon={!imageUrl ? <UserOutlined /> : undefined}
+                  className="profile-form-avatar"
+                />
+              )}
+            </div>
+            
+            <Upload
+              name="profilePicture"
+              showUploadList={false}
+              beforeUpload={handleImageUpload}
+              accept="image/*"
+              className="profile-form-upload"
+            >
+              <Button icon={<UploadOutlined />}>
+                Cambiar imagen
+              </Button>
+            </Upload>
+          </div>
+
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            className="profile-form"
           >
-            Guardar cambios
-          </Button>
-        </Form.Item>
-      </Form>
+            <Form.Item
+              name="username"
+              label="Nombre de usuario"
+              rules={[
+                { required: true, message: 'Por favor ingresa tu nombre de usuario' },
+                { min: 3, message: 'El nombre de usuario debe tener al menos 3 caracteres' },
+                { max: 50, message: 'El nombre de usuario no puede exceder los 50 caracteres' }
+              ]}
+            >
+              <Input 
+                prefix={<UserOutlined />} 
+                placeholder="Nombre de usuario" 
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="email"
+              label="Correo electrónico"
+              rules={[
+                { required: true, message: 'Por favor ingresa tu correo electrónico' },
+                { type: 'email', message: 'Por favor ingresa un correo electrónico válido' }
+              ]}
+            >
+              <Input 
+                prefix={<MailOutlined />} 
+                placeholder="Correo electrónico" 
+              />
+            </Form.Item>
+
+            <Form.Item className="profile-form-submit">
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                loading={loading}
+                className="profile-form-submit-button"
+              >
+                Guardar cambios
+              </Button>
+            </Form.Item>
+          </Form>
+        </>
+      )}
     </div>
   );
 };
